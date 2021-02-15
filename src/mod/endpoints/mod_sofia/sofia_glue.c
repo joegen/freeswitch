@@ -2211,6 +2211,7 @@ void sofia_glue_del_profile(sofia_profile_t *profile)
 			switch_core_hash_delete(mod_sofia_globals.gateway_hash, pkey);
 			switch_safe_free(pkey);
 			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "deleted gateway %s from profile %s\n", gp->name, profile->name);
+			switch_core_destroy_memory_pool(&(gp->pool));
 		}
 		profile->gateways = NULL;
 	}
