@@ -151,6 +151,15 @@ void sofia_reg_fire_custom_gateway_state_event(sofia_gateway_t *gateway, int sta
 		switch_event_add_header_string(s_event, SWITCH_STACK_BOTTOM, "Gateway", gateway->name);
 		switch_event_add_header_string(s_event, SWITCH_STACK_BOTTOM, "State", sofia_state_string(gateway->state));
 		switch_event_add_header_string(s_event, SWITCH_STACK_BOTTOM, "Ping-Status", sofia_gateway_status_name(gateway->status));
+
+		if (!zstr(gateway->register_username)) {
+			switch_event_add_header_string(s_event, SWITCH_STACK_BOTTOM, "Register-Username", gateway->register_username);
+		}
+		if (!zstr(gateway->register_realm)) {
+			switch_event_add_header_string(s_event, SWITCH_STACK_BOTTOM, "Register-Realm", gateway->register_realm);
+		}
+
+
 		if (!zstr_buf(gateway->register_network_ip)) {
 			switch_event_add_header_string(s_event, SWITCH_STACK_BOTTOM, "Register-Network-IP", gateway->register_network_ip);
 			switch_event_add_header(s_event, SWITCH_STACK_BOTTOM, "Register-Network-Port", "%d", gateway->register_network_port);
