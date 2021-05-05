@@ -4041,7 +4041,7 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 
 			gateway->register_from = switch_core_sprintf(gateway->pool, "<sip:%s@%s>",
 				 from_user, !zstr(from_domain) ? from_domain : proxy);
-
+			gateway->from_user = switch_core_strdup(gateway->pool, from_user);
 			if (ping_freq) {
 				if (ping_freq >= 5) {
 					gateway->ping_freq = ping_freq;

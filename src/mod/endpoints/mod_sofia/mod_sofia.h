@@ -524,6 +524,7 @@ struct sofia_gateway {
 	char *register_url;
 	char *destination_prefix;
 	char *from_domain;
+	char *from_user;
 	sofia_transport_t register_transport;
 	uint32_t freq;
 	time_t expires;
