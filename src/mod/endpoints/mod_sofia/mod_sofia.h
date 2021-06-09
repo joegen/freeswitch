@@ -522,6 +522,7 @@ struct sofia_gateway {
 	char *register_context;
 	char *expires_str;
 	char *register_url;
+  char *register_route;
 	char *destination_prefix;
 	char *from_domain;
 	char *from_user;

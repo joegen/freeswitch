@@ -3890,6 +3890,10 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 					contact_host = val;
 				} else if (!strcmp(var, "register-proxy")) {
 					register_proxy = val;
+				} else if (!strcmp(var, "register-route")) {
+					if (!zstr(val)) {
+						gateway->register_route = switch_core_strdup(gateway->pool, val);
+					}
 				} else if (!strcmp(var, "outbound-proxy")) {
 					outbound_proxy = val;
 				} else if (!strcmp(var, "distinct-to")) {
