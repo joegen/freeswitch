@@ -3736,6 +3736,8 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 
 		if ((gateway = switch_core_alloc(pool, sizeof(*gateway)))) {
 			const char *sipip, *format;
+			int sipport = 5060;
+			int force_sipport = 0;
 			switch_uuid_t uuid;
 			uint32_t ping_freq = 0, extension_in_contact = 0, contact_in_ping = 0, ping_monitoring = 0, distinct_to = 0, rfc_5626 = 0;
 			int ping_max = 1, ping_min = 1;
@@ -3856,6 +3858,8 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 					contact_in_ping = switch_true(val);
 				} else if (!strcmp(var, "ping")) {
 					ping_freq = atoi(val);
+				} else if (!strcmp(var, "force-sipport")) {
+					force_sipport = atoi(val);
 				} else if (!strcmp(var, "ping-max")) {
 					ping_max = atoi(val);
 				} else if (!strcmp(var, "ping-min")) {
@@ -4101,35 +4105,38 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 				switch_safe_free(register_host);
 			}
 
+			if (force_sipport) {
+				sipport = force_sipport;
+			} else {
+				sipport = sofia_glue_transport_has_tls(gateway->register_transport) ?
+							profile->tls_sip_port : profile->extsipport;
+			}
+
 			if (extension_in_contact) {
 				if (rfc_5626) {
 					format = strchr(sipip, ':') ? "<sip:%s@[%s]:%d>%s" : "<sip:%s@%s:%d%s>%s";
 					gateway->register_contact = switch_core_sprintf(gateway->pool, format, extension,
 							sipip,
-							sofia_glue_transport_has_tls(gateway->register_transport) ?
-							profile->tls_sip_port : profile->extsipport, params, str_rfc_5626);
+							sipport, params, str_rfc_5626);
 
 				} else {
 					format = strchr(sipip, ':') ? "<sip:%s@[%s]:%d%s>" : "<sip:%s@%s:%d%s>";
 					gateway->register_contact = switch_core_sprintf(gateway->pool, format, extension,
 							sipip,
-							sofia_glue_transport_has_tls(gateway->register_transport) ?
-							profile->tls_sip_port : profile->extsipport, params);
+							sipport, params);
 				}
 			} else {
 				if (rfc_5626) {
 					format = strchr(sipip, ':') ? "<sip:gw+%s@[%s]:%d%s>%s" : "<sip:gw+%s@%s:%d%s>%s";
 					gateway->register_contact = switch_core_sprintf(gateway->pool, format, gateway->name,
 							sipip,
-							sofia_glue_transport_has_tls(gateway->register_transport) ?
-							profile->tls_sip_port : profile->extsipport, params, str_rfc_5626);
+							sipport, params, str_rfc_5626);
 
 				} else {
 					format = strchr(sipip, ':') ? "<sip:gw+%s@[%s]:%d%s>" : "<sip:gw+%s@%s:%d%s>";
 					gateway->register_contact = switch_core_sprintf(gateway->pool, format, gateway->name,
 							sipip,
-							sofia_glue_transport_has_tls(gateway->register_transport) ?
-							profile->tls_sip_port : profile->extsipport, params);
+							sipport, params);
 
 				}
 			}
