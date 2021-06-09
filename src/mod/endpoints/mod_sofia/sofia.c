@@ -4037,11 +4037,15 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 				gateway->from_domain = switch_core_strdup(gateway->pool, from_domain);
 			}
 
+#if 0
 			if (!zstr(register_transport) && !switch_stristr("transport=", proxy)) {
 				gateway->register_url = switch_core_sprintf(gateway->pool, "sip:%s;transport=%s", proxy, register_transport);
 			} else {
 				gateway->register_url = switch_core_sprintf(gateway->pool, "sip:%s", proxy);
 			}
+#else
+			gateway->register_url = switch_core_sprintf(gateway->pool, "sip:%s", !zstr(from_domain) ? from_domain : proxy);
+#endif
 
 			gateway->register_from = switch_core_sprintf(gateway->pool, "<sip:%s@%s>",
 				 from_user, !zstr(from_domain) ? from_domain : proxy);
