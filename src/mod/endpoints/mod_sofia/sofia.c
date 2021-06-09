@@ -3739,7 +3739,7 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 			int sipport = 5060;
 			int force_sipport = 0;
 			switch_uuid_t uuid;
-			uint32_t ping_freq = 0, extension_in_contact = 0, contact_in_ping = 0, ping_monitoring = 0, distinct_to = 0, rfc_5626 = 0;
+			uint32_t ping_freq = 0, use_standard_contact = 0, extension_in_contact = 0, contact_in_ping = 0, ping_monitoring = 0, distinct_to = 0, rfc_5626 = 0;
 			int ping_max = 1, ping_min = 1;
 			char *register_str = "true", *scheme = "Digest",
 				*realm = NULL,
@@ -3846,6 +3846,8 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 					username = val;
 				} else if (!strcmp(var, "extension-in-contact")) {
 					extension_in_contact = switch_true(val);
+				} else if (!strcmp(var, "use-standard-contact")) {
+					use_standard_contact = switch_true(val);
 				} else if (!strcmp(var, "auth-username")) {
 					auth_username = val;
 				} else if (!strcmp(var, "password")) {
@@ -4029,12 +4031,24 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 
 			if (! zstr(contact_params)) {
 				if (*contact_params == ';') {
-					params = switch_core_sprintf(gateway->pool, "%s;transport=%s;gw=%s", contact_params, register_transport, gateway->name);
+					if (use_standard_contact) {
+						params = switch_core_sprintf(gateway->pool, "%s;transport=%s", contact_params, register_transport);
+					} else {
+						params = switch_core_sprintf(gateway->pool, "%s;transport=%s;gw=%s", contact_params, register_transport, gateway->name);
+					}
 				} else {
-					params = switch_core_sprintf(gateway->pool, ";%s;transport=%s;gw=%s", contact_params, register_transport, gateway->name);
+					if (use_standard_contact) {
+						params = switch_core_sprintf(gateway->pool, ";%s;transport=%s", contact_params, register_transport);
+					} else {
+						params = switch_core_sprintf(gateway->pool, ";%s;transport=%s;gw=%s", contact_params, register_transport, gateway->name);
+					}
 				}
 			} else {
-				params = switch_core_sprintf(gateway->pool, ";transport=%s;gw=%s", register_transport, gateway->name);
+				if (use_standard_contact) {
+						params = switch_core_sprintf(gateway->pool, ";transport=%s", register_transport);
+				} else {
+					params = switch_core_sprintf(gateway->pool, ";transport=%s;gw=%s", register_transport, gateway->name);
+				}
 			}
 
 			if (!zstr(from_domain)) {
@@ -4120,7 +4134,13 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 							profile->tls_sip_port : profile->extsipport;
 			}
 
-			if (extension_in_contact) {
+			if (use_standard_contact)
+			{
+				format = strchr(sipip, ':') ? "<sip:%s@[%s]:%d%s>" : "<sip:%s@%s:%d%s>";
+					gateway->register_contact = switch_core_sprintf(gateway->pool, format, username,
+							sipip,
+							sipport, params);
+			} else if (extension_in_contact) {
 				if (rfc_5626) {
 					format = strchr(sipip, ':') ? "<sip:%s@[%s]:%d>%s" : "<sip:%s@%s:%d%s>%s";
 					gateway->register_contact = switch_core_sprintf(gateway->pool, format, extension,
