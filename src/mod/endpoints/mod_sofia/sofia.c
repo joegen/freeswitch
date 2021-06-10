@@ -4137,7 +4137,7 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 			if (use_standard_contact)
 			{
 				format = strchr(sipip, ':') ? "<sip:%s@[%s]:%d%s>" : "<sip:%s@%s:%d%s>";
-					gateway->register_contact = switch_core_sprintf(gateway->pool, format, username,
+					gateway->register_contact = switch_core_sprintf(gateway->pool, format, from_user,
 							sipip,
 							sipport, params);
 			} else if (extension_in_contact) {
