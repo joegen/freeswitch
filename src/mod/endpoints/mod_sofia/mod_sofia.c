@@ -4352,6 +4352,13 @@ SWITCH_STANDARD_API(sofia_presence_data_function)
 }
 
 /* <gateway_name> [ivar|ovar|var] <name> */
+SWITCH_STANDARD_API(sofia_gateway_count_reged_fuction)
+{
+	stream->write_function(stream, "%d", sofia_reg_count_gateway_reged());
+	return SWITCH_STATUS_SUCCESS;
+}
+
+/* <gateway_name> [ivar|ovar|var] <name> */
 SWITCH_STANDARD_API(sofia_gateway_data_function)
 {
 	char *argv[4];
@@ -6356,6 +6363,7 @@ SWITCH_MODULE_LOAD_FUNCTION(mod_sofia_load)
 
 
 	SWITCH_ADD_API(api_interface, "sofia", "Sofia Controls", sofia_function, "<cmd> <args>");
+	SWITCH_ADD_API(api_interface, "sofia_gateway_count_reged", "Get total registered gateways", sofia_gateway_count_reged_fuction, "");
 	SWITCH_ADD_API(api_interface, "sofia_gateway_data", "Get data from a sofia gateway", sofia_gateway_data_function, "<gateway_name> [ivar|ovar|var] <name>");
 	switch_console_set_complete("add sofia ::[help:status");
 	switch_console_set_complete("add sofia status profile ::sofia::list_profiles reg");

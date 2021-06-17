@@ -3333,6 +3333,27 @@ sofia_gateway_t *sofia_reg_find_gateway__(const char *file, const char *func, in
 	return gateway;
 }
 
+int sofia_reg_count_gateway_reged()
+{
+	sofia_gateway_t *gateway = NULL;
+	switch_hash_index_t *hi;
+	const void *var;
+	void *val;
+	int count = 0;
+
+	switch_mutex_lock(mod_sofia_globals.hash_mutex);
+	for (hi = switch_core_hash_first(mod_sofia_globals.gateway_hash); hi; hi = switch_core_hash_next(&hi)) {
+		switch_core_hash_this(hi, &var, NULL, &val);
+		gateway = (sofia_gateway_t *) val;
+		if (gateway->state == REG_STATE_REGED) {
+			count++;
+		}
+	}
+	switch_safe_free(hi);
+	switch_mutex_unlock(mod_sofia_globals.hash_mutex);
+	return count;
+}
+
 
 sofia_gateway_t *sofia_reg_find_gateway_by_realm__(const char *file, const char *func, int line, const char *key)
 {
