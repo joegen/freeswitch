@@ -1099,6 +1099,10 @@ sofia_gateway_t *sofia_reg_find_gateway__(const char *file, const char *func, in
 sofia_gateway_t *sofia_reg_find_gateway_by_realm__(const char *file, const char *func, int line, const char *key);
 #define sofia_reg_find_gateway_by_realm(x) sofia_reg_find_gateway_by_realm__(__FILE__, __SWITCH_FUNC__, __LINE__,  x)
 
+int sofia_reg_count_gateway_fail_wait(sofia_profile_t *profile);
+int sofia_reg_count_gateway_reged(sofia_profile_t *profile);
+int sofia_reg_count_gateway_by_state(sofia_profile_t *profile, reg_state_t state);
+
 sofia_gateway_subscription_t *sofia_find_gateway_subscription(sofia_gateway_t *gateway_ptr, const char *event);
 
 #define sofia_reg_gateway_rdlock(x) sofia_reg_gateway_rdlock__(__FILE__, __SWITCH_FUNC__, __LINE__,  x)
