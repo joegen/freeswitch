@@ -3346,6 +3346,8 @@ int sofia_reg_count_gateway_reged()
 		switch_core_hash_this(hi, &var, NULL, &val);
 		gateway = (sofia_gateway_t *) val;
 		if (gateway->state == REG_STATE_REGED) {
+                    switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING,
+								  "REGISTERED %s", gateway->name);
 			count++;
 		}
 	}
