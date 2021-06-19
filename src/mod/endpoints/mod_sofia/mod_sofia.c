@@ -3812,6 +3812,23 @@ static int contact_callback(void *pArg, int argc, char **argv, char **columnName
 	return 0;
 }
 
+/* <gateway_name> [ivar|ovar|var] <name> */
+SWITCH_STANDARD_API(sofia_gateway_count_reged_fuction)
+{
+	sofia_profile_t *profile = NULL;
+	if (!cmd) {
+		stream->write_function(stream, "%s", "");
+		return SWITCH_STATUS_SUCCESS;
+	}
+	if (!(profile = sofia_glue_find_profile(cmd))) {
+		stream->write_function(stream, "%s", "");
+		return SWITCH_STATUS_SUCCESS;
+	}
+	stream->write_function(stream, "%d", sofia_reg_count_gateway_reged(profile));
+	sofia_glue_release_profile(profile);
+	return SWITCH_STATUS_SUCCESS;
+}
+
 SWITCH_STANDARD_API(sofia_count_reg_function)
 {
 	char *data;
@@ -4351,12 +4368,6 @@ SWITCH_STANDARD_API(sofia_presence_data_function)
 	return SWITCH_STATUS_SUCCESS;
 }
 
-/* <gateway_name> [ivar|ovar|var] <name> */
-SWITCH_STANDARD_API(sofia_gateway_count_reged_fuction)
-{
-	stream->write_function(stream, "%d", sofia_reg_count_gateway_reged());
-	return SWITCH_STATUS_SUCCESS;
-}
 
 /* <gateway_name> [ivar|ovar|var] <name> */
 SWITCH_STANDARD_API(sofia_gateway_data_function)
