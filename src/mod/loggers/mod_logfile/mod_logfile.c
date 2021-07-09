@@ -426,25 +426,12 @@ SWITCH_STANDARD_API(log_rotate_function)
         void *val;
         const void *var;
         logfile_profile_t *profile;
-
-        if (globals.rotate) {
-                for (hi = switch_core_hash_first(profile_hash); hi; hi = switch_core_hash_next(&hi)) {
-                        switch_core_hash_this(hi, &var, NULL, &val);
-                        profile = val;
-                        mod_logfile_rotate(profile);
-                }
-        } else {
-                switch_mutex_lock(globals.mutex);
-                for (hi = switch_core_hash_first(profile_hash); hi; hi = switch_core_hash_next(&hi)) {
-                        switch_core_hash_this(hi, &var, NULL, &val);
-                        profile = val;
-                        switch_file_close(profile->log_afd);
-                        if (mod_logfile_openlogfile(profile, SWITCH_TRUE) != SWITCH_STATUS_SUCCESS) {
-                                switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_CRIT, "Error Re-opening Log!\n");
-                        }
-                }
-                switch_mutex_unlock(globals.mutex);
+        for (hi = switch_core_hash_first(profile_hash); hi; hi = switch_core_hash_next(&hi)) {
+                switch_core_hash_this(hi, &var, NULL, &val);
+                profile = val;
+                mod_logfile_rotate(profile);
         }
+        stream->write_function(stream, "+OK");
         return SWITCH_STATUS_SUCCESS;
 }
 
