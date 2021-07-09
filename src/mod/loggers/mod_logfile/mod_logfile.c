@@ -355,9 +355,11 @@ static switch_status_t load_profile(switch_xml_t xml)
 				new_profile->roll_size = switch_atoui(val);
 			} else if (!strcmp(var, "maximum-rotate")) {
 				new_profile->max_rot = switch_atoui(val);
+#if 0
 				if (new_profile->max_rot == 0) {
 					new_profile->max_rot = MAX_ROT;
 				}
+#endif
 			} else if (!strcmp(var, "uuid")) {
 				new_profile->log_uuid = switch_true(val);
 			}
@@ -418,8 +420,37 @@ static void event_handler(switch_event_t *event)
 	}
 }
 
+SWITCH_STANDARD_API(log_rotate_function)
+{
+        switch_hash_index_t *hi;
+        void *val;
+        const void *var;
+        logfile_profile_t *profile;
+
+        if (globals.rotate) {
+                for (hi = switch_core_hash_first(profile_hash); hi; hi = switch_core_hash_next(&hi)) {
+                        switch_core_hash_this(hi, &var, NULL, &val);
+                        profile = val;
+                        mod_logfile_rotate(profile);
+                }
+        } else {
+                switch_mutex_lock(globals.mutex);
+                for (hi = switch_core_hash_first(profile_hash); hi; hi = switch_core_hash_next(&hi)) {
+                        switch_core_hash_this(hi, &var, NULL, &val);
+                        profile = val;
+                        switch_file_close(profile->log_afd);
+                        if (mod_logfile_openlogfile(profile, SWITCH_TRUE) != SWITCH_STATUS_SUCCESS) {
+                                switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_CRIT, "Error Re-opening Log!\n");
+                        }
+                }
+                switch_mutex_unlock(globals.mutex);
+        }
+        return SWITCH_STATUS_SUCCESS;
+}
+
 SWITCH_MODULE_LOAD_FUNCTION(mod_logfile_load)
 {
+	switch_api_interface_t *api_interface;
 	char *cf = "logfile.conf";
 	switch_xml_t cfg, xml, settings, param, profiles, xprofile;
 
@@ -466,6 +497,8 @@ SWITCH_MODULE_LOAD_FUNCTION(mod_logfile_load)
 	}
 
 	switch_log_bind_logger(mod_logfile_logger, SWITCH_LOG_DEBUG, SWITCH_FALSE);
+
+	SWITCH_ADD_API(api_interface, "log_rotate", "log_rotate", log_rotate_function, "");
 
 	return SWITCH_STATUS_SUCCESS;
 }
