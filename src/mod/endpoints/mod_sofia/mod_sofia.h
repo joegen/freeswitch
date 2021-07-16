@@ -545,6 +545,7 @@ struct sofia_gateway {
 	switch_bool_t ping_monitoring;
 	uint8_t flags[REG_FLAG_MAX];
 	int32_t retry_seconds;
+	int32_t max_retry_seconds;
 	int32_t fail_908_retry_seconds;
 	int32_t reg_timeout_seconds;
 	int32_t failure_status;

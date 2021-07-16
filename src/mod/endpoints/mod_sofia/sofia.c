@@ -3753,6 +3753,7 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 				*context = profile->context,
 				*expire_seconds = "3600",
 				*retry_seconds = "30",
+				*max_retry_seconds = "600",
 				*fail_908_retry_seconds = NULL,
 				*timeout_seconds = "60",
 				*from_user = "", *from_domain = NULL, *outbound_proxy = NULL, *register_proxy = NULL, *contact_host = NULL,
@@ -3880,6 +3881,8 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 					fail_908_retry_seconds = val;
 				} else if (!strcmp(var, "retry-seconds")) {
 					retry_seconds = val;
+				} else if (!strcmp(var, "max-retry-seconds")) {
+					max_retry_seconds = val;
 				} else if (!strcmp(var, "timeout-seconds")) {
 					timeout_seconds = val;
 				} else if (!strcmp(var, "retry_seconds")) {	// support typo for back compat
@@ -3994,6 +3997,7 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 			}
 
 			gateway->retry_seconds = atoi(retry_seconds);
+			gateway->max_retry_seconds = atoi(max_retry_seconds);
 
 			if (fail_908_retry_seconds) {
 				gateway->fail_908_retry_seconds = atoi(fail_908_retry_seconds);

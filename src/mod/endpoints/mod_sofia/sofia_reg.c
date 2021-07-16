@@ -518,7 +518,10 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 				} else {
 					sec = gateway_ptr->retry_seconds * gateway_ptr->failures;
 				}
-
+				if (gateway_ptr->max_retry_seconds > 30 && sec > gateway_ptr->max_retry_seconds)
+				{
+					sec = gateway_ptr->max_retry_seconds;
+				}
 				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "%s Failed Registration [%d], setting retry to %d seconds.\n",
 								  gateway_ptr->name, gateway_ptr->failure_status, sec);
 
