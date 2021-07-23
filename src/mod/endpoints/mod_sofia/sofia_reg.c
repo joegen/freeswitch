@@ -414,9 +414,9 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 			}
 			break;
 		case REG_STATE_REGISTER:
-			if (profile->debug) {
+			//if (profile->debug) {
 				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Registered %s\n", gateway_ptr->name);
-			}
+			//}
 
 			gateway_ptr->failures = 0;
 
@@ -2470,7 +2470,7 @@ void sofia_reg_handle_sip_r_register(int status,
 
 
 						switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO,
-										  "Changing expire time to %d by request of proxy %s\n", expi, gateway->register_proxy);
+										  "%s Changing expire time to %d by request of proxy %s\n", gateway->name, expi, gateway->register_proxy);
 					}
 				}
 			}
@@ -2656,10 +2656,10 @@ void sofia_reg_handle_sip_r_challenge(int status,
 		goto cancel;
 	}
 
-	if (profile->debug) {
+	//if (profile->debug) {
 		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO, "Authenticating '%s' with '%s'.\n",
 						  (sip_auth_username && sip_auth_password) ? sip_auth_username : gateway->auth_username, authentication);
-	}
+	//}
 
 	ss_state = nua_callstate_authenticating;
 
