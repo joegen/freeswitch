@@ -261,7 +261,7 @@ void sofia_sub_check_gateway(sofia_profile_t *profile, time_t now)
 
 				sofia_reg_new_sub_handle(gw_sub_ptr);
 
-				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "subscribing to [%s] on gateway [%s]\n", gw_sub_ptr->event, gateway_ptr->name);
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "subscribing to [%s] on gateway [%s]\n", gw_sub_ptr->event, gateway_ptr->name);
 
 				if (now) {
 					nua_subscribe(gw_sub_ptr->nh,
@@ -326,7 +326,7 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 			if ((check = switch_core_hash_find(mod_sofia_globals.gateway_hash, gateway_ptr->name)) && check == gateway_ptr) {
 				char *pkey = switch_mprintf("%s::%s", profile->name, gateway_ptr->name);
 				switch_assert(pkey);
-				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "Removing gateway %s from hash.\n", pkey);
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Removing gateway %s from hash.\n", pkey);
 				switch_core_hash_delete(mod_sofia_globals.gateway_hash, pkey);
 				switch_core_hash_delete(mod_sofia_globals.gateway_hash, gateway_ptr->name);
 				free(pkey);
@@ -415,7 +415,7 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 			break;
 		case REG_STATE_REGISTER:
 			if (profile->debug) {
-				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "Registered %s\n", gateway_ptr->name);
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Registered %s\n", gateway_ptr->name);
 			}
 
 			gateway_ptr->failures = 0;
@@ -1745,7 +1745,7 @@ uint8_t sofia_reg_handle_register_token(nua_t *nua, sofia_profile_t *profile, nu
 			}
 
 			if (profile->debug) {
-				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "Send %s for [%s@%s]\n",
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Send %s for [%s@%s]\n",
 								  forbidden ? "forbidden" : "challenge", to_user, to_host);
 			}
 			/* Log line added to support Fail2Ban */
@@ -1801,7 +1801,7 @@ uint8_t sofia_reg_handle_register_token(nua_t *nua, sofia_profile_t *profile, nu
 		sofia_reg_auth_challenge(profile, nh, de, regtype, realm, stale, exptime);
 
 		if (profile->debug) {
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "Send challenge for [%s@%s]\n", to_user, to_host);
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Send challenge for [%s@%s]\n", to_user, to_host);
 		}
 		/* Log line added to support Fail2Ban */
 		if (sofia_test_pflag(profile, PFLAG_LOG_AUTH_FAIL)) {
@@ -1881,7 +1881,7 @@ uint8_t sofia_reg_handle_register_token(nua_t *nua, sofia_profile_t *profile, nu
 
 
 	if (multi_reg && avoid_multi_reg) {
-		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG,
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO,
 						  "Disabling multiple registrations on a per-user basis for %s@%s\n", switch_str_nil(to_user), switch_str_nil(to_host));
 		multi_reg = 0;
 	}
@@ -2047,7 +2047,7 @@ uint8_t sofia_reg_handle_register_token(nua_t *nua, sofia_profile_t *profile, nu
 
 
 		if (profile->debug) {
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG,
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO,
 							  "Register:\nFrom:    [%s@%s]\nContact: [%s]\nExpires: [%ld]\n", to_user, reg_host, contact_str, (long) exptime);
 		}
 
@@ -2379,7 +2379,7 @@ void sofia_reg_handle_sip_i_register(nua_t *nua, sofia_profile_t *profile, nua_h
 
 	if (is_nat && profile->local_network && switch_check_network_list_ip(network_ip, profile->local_network)) {
 		if (profile->debug) {
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "IP %s is on local network, not seting NAT mode.\n", network_ip);
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "IP %s is on local network, not seting NAT mode.\n", network_ip);
 		}
 		is_nat = NULL;
 	}
@@ -2469,7 +2469,7 @@ void sofia_reg_handle_sip_r_register(int status,
 						}
 
 
-						switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG,
+						switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO,
 										  "Changing expire time to %d by request of proxy %s\n", expi, gateway->register_proxy);
 					}
 				}
@@ -2536,7 +2536,7 @@ void sofia_reg_handle_sip_r_challenge(int status,
 		private_object_t *tech_pvt;
 
 		if ((tech_pvt = switch_core_session_get_private(session)) && sofia_test_flag(tech_pvt, TFLAG_REFER)) {
-			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "Received reply from REFER\n");
+			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO, "Received reply from REFER\n");
 			goto end;
 		}
 
@@ -2549,7 +2549,7 @@ void sofia_reg_handle_sip_r_challenge(int status,
 	} else if (sip->sip_proxy_authenticate) {
 		authenticate = sip->sip_proxy_authenticate;
 	} else {
-		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "Missing Authenticate Header!\n");
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO, "Missing Authenticate Header!\n");
 		goto end;
 	}
 
@@ -2657,7 +2657,7 @@ void sofia_reg_handle_sip_r_challenge(int status,
 	}
 
 	if (profile->debug) {
-		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_DEBUG, "Authenticating '%s' with '%s'.\n",
+		switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO, "Authenticating '%s' with '%s'.\n",
 						  (sip_auth_username && sip_auth_password) ? sip_auth_username : gateway->auth_username, authentication);
 	}
 
@@ -2813,7 +2813,7 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
 		if (zstr(username) || zstr(to_user) || strcasecmp(to_user, username)) {
 			/* Names don't match, so fail */
 			if (profile->debug) {
-				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "SIP username %s does not match auth username\n", switch_str_nil(to_user));
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "SIP username %s does not match auth username\n", switch_str_nil(to_user));
 			}
 			goto end;
 		}
@@ -3010,16 +3010,16 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
 				ret = AUTH_FORBIDDEN;
 				goto end;
 			} else {
-				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "IP %s Rejected by user acl [%s] checking proxy ACLs now\n", ip, auth_acl);
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "IP %s Rejected by user acl [%s] checking proxy ACLs now\n", ip, auth_acl);
 			}
 			/* Check if network_ip is a proxy allowed to send us calls */
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "%d acls to check for proxy\n", profile->proxy_acl_count);
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "%d acls to check for proxy\n", profile->proxy_acl_count);
 
 			for (x = 0; x < profile->proxy_acl_count; x++) {
 				last_acl = profile->proxy_acl[x];
-				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "checking %s against acl %s\n", ip, last_acl);
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "checking %s against acl %s\n", ip, last_acl);
 				if (switch_check_network_list_ip(ip, last_acl)) {
-					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "%s is a proxy according to the %s acl\n", ip, last_acl);
+					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "%s is a proxy according to the %s acl\n", ip, last_acl);
 					network_ip_is_proxy = 1;
 					break;
 				}
@@ -3028,19 +3028,19 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
 			 * if network_ip is a proxy allowed to send traffic, check for auth
 			 * ip header and see if it matches against the auth acl
 			 */
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "network ip is a proxy [%d]\n", network_ip_is_proxy);
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "network ip is a proxy [%d]\n", network_ip_is_proxy);
 			if (network_ip_is_proxy) {
 				int x_auth_ip = 0;
 				for (un = sip->sip_unknown; un; un = un->un_next) {
 					if (!strcasecmp(un->un_name, "X-AUTH-IP")) {
-						switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "found auth ip [%s] header of [%s]\n", un->un_name, un->un_value);
+						switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "found auth ip [%s] header of [%s]\n", un->un_name, un->un_value);
 						if (!zstr(un->un_value)) {
 							if (!switch_check_network_list_ip(un->un_value, auth_acl)) {
 								switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "IP %s Rejected by user acl %s\n", un->un_value, auth_acl);
 								ret = AUTH_FORBIDDEN;
 								goto end;
 							} else {
-								switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG,
+								switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO,
 												  "IP %s allowed by acl %s, checking credentials\n", un->un_value, auth_acl);
 								x_auth_ip = 1;
 								break;
@@ -3054,7 +3054,7 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
 				}
 			}
 		} else {
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "IP [%s] passed ACL check [%s]\n", ip, auth_acl);
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "IP [%s] passed ACL check [%s]\n", ip, auth_acl);
 		}
 	}
 
@@ -3080,7 +3080,7 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
 	if (user_agent_filter) {
 		if (switch_regex_match(user_agent, user_agent_filter) == SWITCH_STATUS_SUCCESS) {
 			if (sofia_test_pflag(profile, PFLAG_LOG_AUTH_FAIL)) {
-				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG,
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO,
 								  "SIP auth OK (REGISTER) due to user-agent-filter.  Filter \"%s\" User-Agent \"%s\"\n", user_agent_filter, user_agent);
 			}
 		} else {
@@ -3197,7 +3197,7 @@ auth_res_t sofia_reg_parse_auth(sofia_profile_t *profile,
 
 						if (!zstr(var) && !zstr(val) && (xparams_type[j] == 1 || !strncasecmp(var, "sip-", 4) || !strcasecmp(var, "register-gateway"))) {
 							if (profile->debug) {
-								switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "event_add_header -> '%s' = '%s'\n", var, val);
+								switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "event_add_header -> '%s' = '%s'\n", var, val);
 							}
 							switch_event_add_header_string(*v_event, SWITCH_STACK_BOTTOM, var, val);
 						}
@@ -3438,7 +3438,7 @@ switch_status_t sofia_reg_add_gateway(sofia_profile_t *profile, const char *key,
 
 	if ((gp = switch_core_hash_find(mod_sofia_globals.gateway_hash, key))) {
 		if (gp->deleted) {
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "Removing deleted gateway from hash.\n");
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Removing deleted gateway from hash.\n");
 			switch_core_hash_delete(mod_sofia_globals.gateway_hash, gp->name);
 			switch_core_hash_delete(mod_sofia_globals.gateway_hash, pkey);
 			switch_core_hash_delete(mod_sofia_globals.gateway_hash, key);
