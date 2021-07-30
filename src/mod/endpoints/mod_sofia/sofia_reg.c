@@ -135,7 +135,6 @@ static void sofia_reg_kill_reg(sofia_gateway_t *gateway_ptr)
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "UN-Registering %s\n", gateway_ptr->name);
 		nua_unregister(gateway_ptr->nh,
 			NUTAG_URL(gateway_ptr->register_url),
-			TAG_IF(gateway_ptr->register_route, SIPTAG_ROUTE_STR(gateway_ptr->register_route)),
 			NUTAG_REGISTRAR(gateway_ptr->register_proxy), TAG_END());
 	} else {
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Destroying registration handle for %s\n", gateway_ptr->name);
