@@ -316,6 +316,8 @@ void sofia_sub_check_gateway(sofia_profile_t *profile, time_t now)
 	switch_mutex_unlock(profile->gw_mutex);
 }
 
+long sofia_reg_uniform_distribution(int max);
+
 void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 {
 	sofia_gateway_t *check, *gateway_ptr, *last = NULL;
@@ -447,53 +449,59 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 			gateway_ptr->status = SOFIA_GATEWAY_DOWN;
 			break;
 		case REG_STATE_UNREGED:
-			gateway_ptr->retry = 0;
-
-			if (!gateway_ptr->nh) {
-				sofia_reg_new_handle(gateway_ptr, now ? 1 : 0);
-			}
-
-			register_host = sofia_glue_get_register_host(gateway_ptr->register_proxy);
-
-			/* check for NAT and place a Via header if necessary (hostname or non-local IP) */
-			if (register_host && sofia_glue_check_nat(gateway_ptr->profile, register_host)) {
-				user_via = sofia_glue_create_external_via(NULL, gateway_ptr->profile, gateway_ptr->register_transport);
-			}
-
-			switch_safe_free(register_host);
-
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Registering %s\n", gateway_ptr->name);
-
-			if (now) {
-				nua_register(gateway_ptr->nh,
-							 NUTAG_URL(gateway_ptr->register_url),
-							 TAG_IF(gateway_ptr->register_sticky_proxy, NUTAG_PROXY(gateway_ptr->register_sticky_proxy)),
-							 TAG_IF(user_via, SIPTAG_VIA_STR(user_via)),
-							 TAG_IF(gateway_ptr->register_route, SIPTAG_ROUTE_STR(gateway_ptr->register_route)),
-							 SIPTAG_TO_STR(gateway_ptr->distinct_to ? gateway_ptr->register_to : gateway_ptr->register_from),
-							 SIPTAG_CONTACT_STR(gateway_ptr->register_contact),
-							 SIPTAG_FROM_STR(gateway_ptr->register_from),
-							 SIPTAG_EXPIRES_STR(gateway_ptr->expires_str),
-							 NUTAG_REGISTRAR(gateway_ptr->register_proxy),
-							 NUTAG_OUTBOUND("no-options-keepalive"), NUTAG_OUTBOUND("no-validate"), NUTAG_KEEPALIVE(0), TAG_NULL());
-				gateway_ptr->retry = now + gateway_ptr->retry_seconds;
-			} else {
+			if (now && !gateway_ptr->nh) {
+				sofia_reg_new_handle(gateway_ptr, 1);
+				gateway_ptr->retry = switch_epoch_time_now(NULL) + (int)sofia_reg_uniform_distribution(300);
 				gateway_ptr->status = SOFIA_GATEWAY_DOWN;
-				nua_unregister(gateway_ptr->nh,
-							   NUTAG_URL(gateway_ptr->register_url),
-							   TAG_IF(gateway_ptr->register_sticky_proxy, NUTAG_PROXY(gateway_ptr->register_sticky_proxy)),
-							   TAG_IF(user_via, SIPTAG_VIA_STR(user_via)),
-							   TAG_IF(gateway_ptr->register_route, SIPTAG_ROUTE_STR(gateway_ptr->register_route)),
-							   SIPTAG_FROM_STR(gateway_ptr->register_from),
-							   SIPTAG_TO_STR(gateway_ptr->distinct_to ? gateway_ptr->register_to : gateway_ptr->register_from),
-							   SIPTAG_EXPIRES_STR(gateway_ptr->expires_str),
-							   NUTAG_REGISTRAR(gateway_ptr->register_proxy),
-							   NUTAG_OUTBOUND("no-options-keepalive"), NUTAG_OUTBOUND("no-validate"), NUTAG_KEEPALIVE(0), TAG_NULL());
+				gateway_ptr->state = REG_STATE_FAIL_WAIT;
+				gateway_ptr->failure_status = 0;
+			} else {
+				if (!gateway_ptr->nh) {
+					sofia_reg_new_handle(gateway_ptr, now ? 1 : 0);
+				}
+				gateway_ptr->retry = 0;
+				register_host = sofia_glue_get_register_host(gateway_ptr->register_proxy);
+
+				/* check for NAT and place a Via header if necessary (hostname or non-local IP) */
+				if (register_host && sofia_glue_check_nat(gateway_ptr->profile, register_host)) {
+					user_via = sofia_glue_create_external_via(NULL, gateway_ptr->profile, gateway_ptr->register_transport);
+				}
+
+				switch_safe_free(register_host);
+
+				switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Registering %s\n", gateway_ptr->name);
+
+				if (now) {
+					nua_register(gateway_ptr->nh,
+								 NUTAG_URL(gateway_ptr->register_url),
+								 TAG_IF(gateway_ptr->register_sticky_proxy, NUTAG_PROXY(gateway_ptr->register_sticky_proxy)),
+								 TAG_IF(user_via, SIPTAG_VIA_STR(user_via)),
+								 TAG_IF(gateway_ptr->register_route, SIPTAG_ROUTE_STR(gateway_ptr->register_route)),
+								 SIPTAG_TO_STR(gateway_ptr->distinct_to ? gateway_ptr->register_to : gateway_ptr->register_from),
+								 SIPTAG_CONTACT_STR(gateway_ptr->register_contact),
+								 SIPTAG_FROM_STR(gateway_ptr->register_from),
+								 SIPTAG_EXPIRES_STR(gateway_ptr->expires_str),
+								 NUTAG_REGISTRAR(gateway_ptr->register_proxy),
+								 NUTAG_OUTBOUND("no-options-keepalive"), NUTAG_OUTBOUND("no-validate"), NUTAG_KEEPALIVE(0), TAG_NULL());
+					gateway_ptr->retry = now + gateway_ptr->retry_seconds;
+				} else {
+					gateway_ptr->status = SOFIA_GATEWAY_DOWN;
+					nua_unregister(gateway_ptr->nh,
+								   NUTAG_URL(gateway_ptr->register_url),
+								   TAG_IF(gateway_ptr->register_sticky_proxy, NUTAG_PROXY(gateway_ptr->register_sticky_proxy)),
+								   TAG_IF(user_via, SIPTAG_VIA_STR(user_via)),
+								   TAG_IF(gateway_ptr->register_route, SIPTAG_ROUTE_STR(gateway_ptr->register_route)),
+								   SIPTAG_FROM_STR(gateway_ptr->register_from),
+								   SIPTAG_TO_STR(gateway_ptr->distinct_to ? gateway_ptr->register_to : gateway_ptr->register_from),
+								   SIPTAG_EXPIRES_STR(gateway_ptr->expires_str),
+								   NUTAG_REGISTRAR(gateway_ptr->register_proxy),
+								   NUTAG_OUTBOUND("no-options-keepalive"), NUTAG_OUTBOUND("no-validate"), NUTAG_KEEPALIVE(0), TAG_NULL());
+				}
+				gateway_ptr->reg_timeout = now + gateway_ptr->reg_timeout_seconds;
+				gateway_ptr->state = REG_STATE_TRYING;
+				switch_safe_free(user_via);
+				user_via = NULL;
 			}
-			gateway_ptr->reg_timeout = now + gateway_ptr->reg_timeout_seconds;
-			gateway_ptr->state = REG_STATE_TRYING;
-			switch_safe_free(user_via);
-			user_via = NULL;
 			break;
 
 		case REG_STATE_TIMEOUT:
