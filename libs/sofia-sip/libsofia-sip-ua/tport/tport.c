@@ -3537,9 +3537,11 @@ int tport_send_msg(tport_t *self, msg_t *msg,
 	SU_DEBUG_1(("%s(%p): send truncated for %s/%s:%s%s%s\n",
 		    "tport_vsend", (void *)self, tpn->tpn_proto, tpn->tpn_host, tpn->tpn_port,
 		    comp ? ";comp=" : "", comp ? comp : ""));
-
+#if 0
 	msg_set_errno(msg, EIO);
 	return /* tport_send_fatal(self, msg, tpn, "tport_send") */ -1;
+#endif
+        return 0;
       }
     }
 
