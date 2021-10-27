@@ -566,6 +566,7 @@ struct sofia_gateway {
 	sofia_cid_type_t cid_type;
 	char register_network_ip[80];
 	int register_network_port;
+	int registration_spread;
 };
 
 typedef enum {

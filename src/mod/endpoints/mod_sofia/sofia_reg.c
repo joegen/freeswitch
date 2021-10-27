@@ -451,7 +451,7 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 		case REG_STATE_UNREGED:
 			if (now && !gateway_ptr->nh) {
 				sofia_reg_new_handle(gateway_ptr, 1);
-				gateway_ptr->retry = switch_epoch_time_now(NULL) + (int)sofia_reg_uniform_distribution(300);
+				gateway_ptr->retry = switch_epoch_time_now(NULL) + (int)sofia_reg_uniform_distribution(gateway_ptr->registration_spread);
 				gateway_ptr->status = SOFIA_GATEWAY_DOWN;
 				gateway_ptr->state = REG_STATE_FAIL_WAIT;
 				gateway_ptr->failure_status = 0;

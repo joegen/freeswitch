@@ -3786,6 +3786,7 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 			gateway->ib_failed_calls = 0;
 			gateway->ob_failed_calls = 0;
 			gateway->destination_prefix = "";
+			gateway->registration_spread = 5;
 
 			if ((x_params = switch_xml_child(gateway_tag, "variables"))) {
 				param = switch_xml_child(x_params, "variable");
@@ -3861,6 +3862,8 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 					contact_in_ping = switch_true(val);
 				} else if (!strcmp(var, "ping")) {
 					ping_freq = atoi(val);
+				} else if (!strcmp(var, "registration-spread")) {
+					gateway->registration_spread = atoi(val);
 				} else if (!strcmp(var, "force-sipport")) {
 					force_sipport = atoi(val);
 				} else if (!strcmp(var, "ping-max")) {
