@@ -1429,10 +1429,13 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 						   SIPTAG_PAYLOAD_STR(msg->string_arg),
 						   TAG_IF(!zstr(session_id_header), SIPTAG_HEADER_STR(session_id_header)),
 						   SIPTAG_EVENT_STR("refer"), TAG_END());
-				//switch_channel_hangup(tech_pvt->channel, SWITCH_CAUSE_BLIND_TRANSFER);
 
-				switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO,
-							"%s SWITCH_CAUSE_BLIND_TRANSFER Suppressing Channel Disconnect (1)\n", switch_channel_get_name(channel));
+				if (!switch_channel_var_true(channel, "sip_refer_continue_after_reply")) {
+					switch_channel_hangup(channel, SWITCH_CAUSE_BLIND_TRANSFER);
+				} else {
+					switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO,
+								"%s SWITCH_CAUSE_BLIND_TRANSFER Suppressing Channel Disconnect (1)\n", switch_channel_get_name(channel));
+				}
 				goto end;
 			}
 
@@ -1568,7 +1571,9 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 				msg->string_reply = "no reply";
 			}
 
-			//switch_channel_hangup(tech_pvt->channel, SWITCH_CAUSE_BLIND_TRANSFER);
+			switch_channel_hangup(tech_pvt->channel, SWITCH_CAUSE_BLIND_TRANSFER);
+			
+		} else {
 			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO,
 							"%s SWITCH_CAUSE_BLIND_TRANSFER Suppressing Channel Disconnect (0)\n", switch_channel_get_name(tech_pvt->channel));
 		}

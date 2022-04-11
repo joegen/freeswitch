@@ -682,7 +682,8 @@ void sofia_handle_sip_i_notify(switch_core_session_t *session, int status,
 					switch_channel_set_variable_printf(channel, "sip_refer_target_status_code", "%d", status_val);
 					switch_channel_set_variable(channel, "sip_refer_reply", sip->sip_payload->pl_data);
 					if (status_val == 200 && !switch_channel_var_true(channel, "sip_refer_continue_after_reply")) {
-						//switch_channel_hangup(channel, SWITCH_CAUSE_BLIND_TRANSFER);
+						switch_channel_hangup(channel, SWITCH_CAUSE_BLIND_TRANSFER);
+					} else {
 						switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO,
 							"%s SWITCH_CAUSE_BLIND_TRANSFER Suppressing Channel Disconnect (2)\n", switch_channel_get_name(channel));
 					}
