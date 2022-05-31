@@ -79,6 +79,7 @@
 
 SWITCH_DECLARE_DATA switch_directories SWITCH_GLOBAL_dirs = { 0 };
 SWITCH_DECLARE_DATA switch_filenames SWITCH_GLOBAL_filenames = { 0 };
+SWITCH_DECLARE_DATA switch_global_functions SWITCH_GLOBAL_funcs = { 0 };
 
 /* The main runtime obj we keep this hidden for ourselves */
 struct switch_runtime runtime = { 0 };

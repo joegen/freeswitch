@@ -279,6 +279,7 @@ library_includetest_HEADERS = \
 
 library_includedir      = $(includedir)
 library_include_HEADERS = \
+	src/include/switch_global_funcs.h \
 	src/include/switch_am_config.h \
 	src/include/switch.h \
 	src/include/switch_apr.h \
