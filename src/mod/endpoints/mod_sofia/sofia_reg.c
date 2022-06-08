@@ -2578,6 +2578,7 @@ out:
 	return ret;
 }
 
+#if 0
 static switch_bool_t is_host_from_gateway(const char *remote_ip, sofia_gateway_t *gateway) 
 {
 	switch_bool_t ret = SWITCH_FALSE;
@@ -2627,6 +2628,7 @@ static switch_bool_t is_legitimate_gateway(sofia_dispatch_event_t *de, sofia_gat
 		return is_host_from_gateway(remote_ip, gateway);
 	}
 }
+#endif
 
 void sofia_reg_handle_sip_r_register(int status,
 									 char const *phrase,
@@ -2880,7 +2882,7 @@ void sofia_reg_handle_sip_r_challenge(int status,
 
 	if (sip_auth_username && sip_auth_password) {
 		switch_snprintf(authentication, sizeof(authentication), "%s:%s:%s:%s", scheme, realm, sip_auth_username, sip_auth_password);
-	} else if (gateway && is_legitimate_gateway(de, gateway)) {
+	} else if (gateway /*&& is_legitimate_gateway(de, gateway)*/) {
 		switch_snprintf(authentication, sizeof(authentication), "%s:%s:%s:%s", scheme, realm, gateway->auth_username, gateway->register_password);
 	} else {
 		if (gateway) {
