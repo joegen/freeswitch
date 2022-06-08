@@ -478,16 +478,18 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 
 				if (now) {
 					char* proxy_override = 0;
-					int free_proxy_override = 0;
 					if (SWITCH_GLOBAL_funcs.switch_get_outbound_proxy) {
 						proxy_override = SWITCH_GLOBAL_funcs.switch_get_outbound_proxy(gateway_ptr->from_domain, gateway_ptr->register_route);
-						free_proxy_override = 1;
-					} else {
-						proxy_override = gateway_ptr->register_sticky_proxy;
-					} 
+						if (proxy_override && strcmp(gateway_ptr->register_proxy, proxy_override)) {
+							gateway_ptr->register_sticky_proxy = switch_core_strdup(gateway_ptr->pool, proxy_override);
+							gateway_ptr->register_proxy = switch_core_strdup(gateway_ptr->pool, proxy_override);
+						}
+						switch_safe_free(proxy_override);
+					}
+
 					nua_register(gateway_ptr->nh,
 								 NUTAG_URL(gateway_ptr->register_url),
-								 TAG_IF(proxy_override, NUTAG_PROXY(proxy_override)),
+								 TAG_IF(gateway_ptr->register_sticky_proxy, NUTAG_PROXY(gateway_ptr->register_sticky_proxy)),
 								 TAG_IF(user_via, SIPTAG_VIA_STR(user_via)),
 								 TAG_IF(gateway_ptr->register_route, SIPTAG_ROUTE_STR(gateway_ptr->register_route)),
 								 SIPTAG_TO_STR(gateway_ptr->distinct_to ? gateway_ptr->register_to : gateway_ptr->register_from),
@@ -497,9 +499,6 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 								 NUTAG_REGISTRAR(gateway_ptr->register_proxy),
 								 NUTAG_OUTBOUND("no-options-keepalive"), NUTAG_OUTBOUND("no-validate"), NUTAG_KEEPALIVE(0), TAG_NULL());
 					gateway_ptr->retry = now + gateway_ptr->retry_seconds;
-					if (free_proxy_override) {
-						switch_safe_free(proxy_override);
-					}
 				} else {
 					gateway_ptr->status = SOFIA_GATEWAY_DOWN;
 					//
