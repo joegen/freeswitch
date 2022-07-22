@@ -948,6 +948,10 @@ static void free_header(switch_event_header_t **header)
 		FREE((*header)->name);
 		FREE((*header)->value);
 
+		// Set the memebers to NULL to avoud double free
+		(*header)->name = 0;
+		(*header)->value = 0;
+
 #ifdef SWITCH_EVENT_RECYCLE
 		if (switch_queue_trypush(EVENT_HEADER_RECYCLE_QUEUE, *header) != SWITCH_STATUS_SUCCESS) {
 			FREE(*header);
