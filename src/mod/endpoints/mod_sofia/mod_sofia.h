@@ -528,6 +528,7 @@ struct sofia_gateway {
 	char *register_to;
 	char *register_proxy;
 	char *register_sticky_proxy;
+	char *register_user_agent;
 	char *outbound_sticky_proxy;
 	char *register_proxy_host_cfg; /* hold only the IP or the hostname, no port, no "sip:" or "sips:" prefix */
 	char *outbound_proxy_host_cfg;

@@ -478,6 +478,8 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 
 				if (now) {
 					char* proxy_override = 0;
+					char* user_agent_override = 0;
+
 					if (SWITCH_GLOBAL_funcs.switch_get_outbound_proxy) {
 						proxy_override = SWITCH_GLOBAL_funcs.switch_get_outbound_proxy(gateway_ptr->from_domain, gateway_ptr->register_route);
 						if (proxy_override && strcmp(gateway_ptr->register_proxy, proxy_override)) {
@@ -487,11 +489,20 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 						switch_safe_free(proxy_override);
 					}
 
+					if (SWITCH_GLOBAL_funcs.switch_get_user_agent) {
+						user_agent_override = SWITCH_GLOBAL_funcs.switch_get_user_agent(gateway_ptr->from_domain);
+						if (user_agent_override && zstr(gateway_ptr->register_user_agent)) {
+							gateway_ptr->register_user_agent = switch_core_strdup(gateway_ptr->pool, user_agent_override);
+						}
+						switch_safe_free(user_agent_override);
+					}
+
 					nua_register(gateway_ptr->nh,
 								 NUTAG_URL(gateway_ptr->register_url),
 								 TAG_IF(gateway_ptr->register_sticky_proxy, NUTAG_PROXY(gateway_ptr->register_sticky_proxy)),
 								 TAG_IF(user_via, SIPTAG_VIA_STR(user_via)),
 								 TAG_IF(gateway_ptr->register_route, SIPTAG_ROUTE_STR(gateway_ptr->register_route)),
+								 TAG_IF(gateway_ptr->register_user_agent, SIPTAG_USER_AGENT_STR(gateway_ptr->register_user_agent)),
 								 SIPTAG_TO_STR(gateway_ptr->distinct_to ? gateway_ptr->register_to : gateway_ptr->register_from),
 								 SIPTAG_CONTACT_STR(gateway_ptr->register_contact),
 								 SIPTAG_FROM_STR(gateway_ptr->register_from),
