@@ -148,7 +148,6 @@ typedef struct private_object private_object_t;
 #include "sofia-sip/tport_tag.h"
 #include <sofia-sip/msg.h>
 #include <sofia-sip/uniqueid.h>
-#include "karoo_utils.h"
 
 typedef enum {
 	SOFIA_CONFIG_LOAD = 0,
@@ -1203,7 +1202,6 @@ const char *sofia_glue_strip_proto(const char *uri);
 void sofia_glue_del_gateway(sofia_gateway_t *gp);
 void sofia_glue_gateway_list(sofia_profile_t *profile, switch_stream_handle_t *stream, int up);
 void sofia_glue_del_every_gateway(sofia_profile_t *profile);
-void sofia_glue_del_gateway_glob(sofia_profile_t *profile, const char *glob);
 void sofia_reg_send_reboot(sofia_profile_t *profile, const char *callid, const char *user, const char *host, const char *contact, const char *user_agent,
 						   const char *network_ip);
 void sofia_glue_restart_all_profiles(void);

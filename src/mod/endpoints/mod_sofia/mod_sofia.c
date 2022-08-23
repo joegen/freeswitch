@@ -40,6 +40,7 @@
 /*************************************************************************************************************************************************************/
 #include "mod_sofia.h"
 #include "sofia-sip/sip_extra.h"
+#include "karoo_utils.h"
 
 #if HAVE_STIRSHAKEN
 #include <stir_shaken.h>
@@ -3602,9 +3603,8 @@ static switch_status_t cmd_profile(char **argv, int argc, switch_stream_handle_t
 		}
 
 		goto done;
-	} else if (!strcasecmp(argv[1], "killgw_glob")) {
-		sofia_glue_del_gateway_glob(profile, argv[2]);
-		stream->write_function(stream, "+OK glob %s marked for deletion.\n", argv[2]);
+	} else if (karoo_profile_cmd(profile, argc, argv, stream)) {
+		goto done;
 	}
 
 	if (!strcasecmp(argv[1], "rescan")) {

@@ -35,6 +35,7 @@
  */
 #include "mod_sofia.h"
 #include <switch_stun.h>
+#include "karoo_utils.h"
 
 switch_cache_db_handle_t *_sofia_glue_get_db_handle(sofia_profile_t *profile, const char *file, const char *func, int line);
 #define sofia_glue_get_db_handle(_p) _sofia_glue_get_db_handle(_p, __FILE__, __SWITCH_FUNC__, __LINE__)
@@ -2070,21 +2071,6 @@ void sofia_glue_del_every_gateway(sofia_profile_t *profile)
 	}
 	switch_mutex_unlock(mod_sofia_globals.hash_mutex);
 }
-
-void sofia_glue_del_gateway_glob(sofia_profile_t *profile, const char *glob)
-{
-	sofia_gateway_t *gp = NULL;
-
-	switch_mutex_lock(mod_sofia_globals.hash_mutex);
-	for (gp = profile->gateways; gp; gp = gp->next) {
-		if (glob_match(glob, gp->name)) {
-			sofia_glue_del_gateway(gp);
-		}
-		sofia_glue_del_gateway(gp);
-	}
-	switch_mutex_unlock(mod_sofia_globals.hash_mutex);
-}
-
 
 void sofia_glue_gateway_list(sofia_profile_t *profile, switch_stream_handle_t *stream, int up)
 {
