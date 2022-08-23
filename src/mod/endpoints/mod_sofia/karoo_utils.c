@@ -87,6 +87,59 @@ void karoo_set_gateway_auth_password(sofia_profile_t *profile, const char *gwnam
   switch_mutex_unlock(mod_sofia_globals.hash_mutex);
 }
 
+void karoo_set_gateway_realm(sofia_profile_t *profile, const char *gwname, const char *value)
+{
+  sofia_gateway_t *gp = NULL;
+  switch_mutex_lock(mod_sofia_globals.hash_mutex);
+  for (gp = profile->gateways; gp; gp = gp->next) {
+    if (!strcasecmp(gwname, gp->name)) {
+      gp->register_realm = switch_core_strdup(gp->pool, value);
+      break;
+    }
+  }
+  switch_mutex_unlock(mod_sofia_globals.hash_mutex);
+}
+
+void karoo_set_gateway_from_user(sofia_profile_t *profile, const char *gwname, const char *value)
+{
+  sofia_gateway_t *gp = NULL;
+  switch_mutex_lock(mod_sofia_globals.hash_mutex);
+  for (gp = profile->gateways; gp; gp = gp->next) {
+    if (!strcasecmp(gwname, gp->name)) {
+      gp->from_user = switch_core_strdup(gp->pool, value);
+      break;
+    }
+  }
+  switch_mutex_unlock(mod_sofia_globals.hash_mutex);
+}
+
+void karoo_set_gateway_from_domain(sofia_profile_t *profile, const char *gwname, const char *value)
+{
+  sofia_gateway_t *gp = NULL;
+  switch_mutex_lock(mod_sofia_globals.hash_mutex);
+  for (gp = profile->gateways; gp; gp = gp->next) {
+    if (!strcasecmp(gwname, gp->name)) {
+      gp->from_domain = switch_core_strdup(gp->pool, value);
+      gp->register_realm = switch_core_strdup(gp->pool, value);
+      break;
+    }
+  }
+  switch_mutex_unlock(mod_sofia_globals.hash_mutex);
+}
+
+void karoo_set_gateway_realm_and_from_domain(sofia_profile_t *profile, const char *gwname, const char *value)
+{
+  sofia_gateway_t *gp = NULL;
+  switch_mutex_lock(mod_sofia_globals.hash_mutex);
+  for (gp = profile->gateways; gp; gp = gp->next) {
+    if (!strcasecmp(gwname, gp->name)) {
+      gp->from_domain = switch_core_strdup(gp->pool, value);
+      break;
+    }
+  }
+  switch_mutex_unlock(mod_sofia_globals.hash_mutex);
+}
+
 switch_bool_t karoo_profile_cmd(sofia_profile_t* profile, int argc, char** argv, switch_stream_handle_t *stream)
 {
   if (argc == 3 && !strcasecmp(argv[1], "killgw_glob")) {
@@ -104,6 +157,22 @@ switch_bool_t karoo_profile_cmd(sofia_profile_t* profile, int argc, char** argv,
   } else if (argc == 4 && !strcasecmp(argv[1], "setgw_password")) {
 		karoo_set_gateway_auth_password(profile, argv[2], argv[3]);
 		stream->write_function(stream, "+OK password set for gateway %s.\n", argv[3]);
+    return SWITCH_TRUE;
+  } else if (argc == 4 && !strcasecmp(argv[1], "setgw_from_user")) {
+		karoo_set_gateway_from_user(profile, argv[2], argv[3]);
+		stream->write_function(stream, "+OK from-user set for gateway %s.\n", argv[3]);
+    return SWITCH_TRUE;
+  } else if (argc == 4 && !strcasecmp(argv[1], "setgw_from_domain")) {
+		karoo_set_gateway_from_domain(profile, argv[2], argv[3]);
+		stream->write_function(stream, "+OK from-domain set for gateway %s.\n", argv[3]);
+    return SWITCH_TRUE;
+  } else if (argc == 4 && !strcasecmp(argv[1], "setgw_realm")) {
+		karoo_set_gateway_realm(profile, argv[2], argv[3]);
+		stream->write_function(stream, "+OK realm set for gateway %s.\n", argv[3]);
+    return SWITCH_TRUE;
+  } else if (argc == 4 && !strcasecmp(argv[1], "setgw_realm_and_domain")) {
+		karoo_set_gateway_realm_and_from_domain(profile, argv[2], argv[3]);
+		stream->write_function(stream, "+OK realm/domain set for gateway %s.\n", argv[3]);
     return SWITCH_TRUE;
   }
   return SWITCH_FALSE;
