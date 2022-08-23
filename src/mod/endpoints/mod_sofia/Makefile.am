@@ -3,7 +3,7 @@ include $(top_srcdir)/build/modmake.rulesam
 MODNAME=mod_sofia
 
 noinst_LTLIBRARIES = libsofiamod.la
-libsofiamod_la_SOURCES   =  mod_sofia.c sofia.c sofia_json_api.c sofia_glue.c sofia_presence.c sofia_reg.c sofia_media.c sip-dig.c rtp.c mod_sofia.h sip-dig.h
+libsofiamod_la_SOURCES   =  mod_sofia.c karoo_utils.h karoo_utils.c sofia.c sofia_json_api.c sofia_glue.c sofia_presence.c sofia_reg.c sofia_media.c sip-dig.c rtp.c mod_sofia.h sip-dig.h
 libsofiamod_la_LDFLAGS   = -static
 libsofiamod_la_CFLAGS  = $(AM_CFLAGS) -I. $(SOFIA_SIP_CFLAGS) $(STIRSHAKEN_CFLAGS)
 if HAVE_STIRSHAKEN

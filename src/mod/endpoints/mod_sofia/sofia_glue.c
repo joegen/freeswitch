@@ -2071,6 +2071,20 @@ void sofia_glue_del_every_gateway(sofia_profile_t *profile)
 	switch_mutex_unlock(mod_sofia_globals.hash_mutex);
 }
 
+void sofia_glue_del_gateway_glob(sofia_profile_t *profile, const char *glob)
+{
+	sofia_gateway_t *gp = NULL;
+
+	switch_mutex_lock(mod_sofia_globals.hash_mutex);
+	for (gp = profile->gateways; gp; gp = gp->next) {
+		if (glob_match(glob, gp->name)) {
+			sofia_glue_del_gateway(gp);
+		}
+		sofia_glue_del_gateway(gp);
+	}
+	switch_mutex_unlock(mod_sofia_globals.hash_mutex);
+}
+
 
 void sofia_glue_gateway_list(sofia_profile_t *profile, switch_stream_handle_t *stream, int up)
 {

@@ -3602,6 +3602,9 @@ static switch_status_t cmd_profile(char **argv, int argc, switch_stream_handle_t
 		}
 
 		goto done;
+	} else if (!strcasecmp(argv[1], "killgw_glob")) {
+		sofia_glue_del_gateway_glob(profile, argv[2]);
+		stream->write_function(stream, "+OK glob %s marked for deletion.\n", argv[2]);
 	}
 
 	if (!strcasecmp(argv[1], "rescan")) {
