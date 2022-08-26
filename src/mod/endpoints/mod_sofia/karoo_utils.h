@@ -15,5 +15,6 @@ void karoo_set_gateway_from_user(sofia_profile_t *profile, const char *gwname, c
 void karoo_set_gateway_from_domain(sofia_profile_t *profile, const char *gwname, const char *value);
 void karoo_set_gateway_realm_and_from_domain(sofia_profile_t *profile, const char *gwname, const char *value);
 void karoo_set_gateway_realm_and_from_domain_glob(sofia_profile_t *profile, const char *glob, const char *value);
+void karoo_parse_single_gateway(sofia_profile_t *profile, switch_xml_t gateway);
 
 #endif /* KAROO_UTILS_H */
