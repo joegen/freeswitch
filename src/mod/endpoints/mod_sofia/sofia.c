@@ -3825,7 +3825,7 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 				*fail_908_retry_seconds = NULL,
 				*timeout_seconds = "60",
 				*from_user = "", *from_domain = NULL, *outbound_proxy = NULL, *register_proxy = NULL, *contact_host = NULL,
-				*contact_params = "", *params = NULL, *register_transport = NULL,
+				*contact_params = "", *params = NULL, /**register_transport = NULL,*/
 				*reg_id = NULL, *str_rfc_5626 = "";
 
 			if (!context) {
@@ -4110,27 +4110,27 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 				sofia_set_flag(gateway, REG_FLAG_CALLERID);
 			}
 
-			register_transport = (char *) sofia_glue_transport2str(gateway->register_transport);
+			/*register_transport = (char *) sofia_glue_transport2str(gateway->register_transport);*/
 
 			if (! zstr(contact_params)) {
 				if (*contact_params == ';') {
 					if (use_standard_contact) {
-						params = switch_core_sprintf(gateway->pool, "%s;transport=%s", contact_params, register_transport);
+						params = switch_core_sprintf(gateway->pool, "%s;transport=%s", contact_params, /*register_transport*/"udp");
 					} else {
-						params = switch_core_sprintf(gateway->pool, "%s;transport=%s;gw=%s", contact_params, register_transport, gateway->name);
+						params = switch_core_sprintf(gateway->pool, "%s;transport=%s;gw=%s", contact_params, /*register_transport*/"udp", gateway->name);
 					}
 				} else {
 					if (use_standard_contact) {
-						params = switch_core_sprintf(gateway->pool, ";%s;transport=%s", contact_params, register_transport);
+						params = switch_core_sprintf(gateway->pool, ";%s;transport=%s", contact_params, /*register_transport*/"udp");
 					} else {
-						params = switch_core_sprintf(gateway->pool, ";%s;transport=%s;gw=%s", contact_params, register_transport, gateway->name);
+						params = switch_core_sprintf(gateway->pool, ";%s;transport=%s;gw=%s", contact_params, /*register_transport*/"udp", gateway->name);
 					}
 				}
 			} else {
 				if (use_standard_contact) {
-						params = switch_core_sprintf(gateway->pool, ";transport=%s", register_transport);
+						params = switch_core_sprintf(gateway->pool, ";transport=%s", /*register_transport*/"udp");
 				} else {
-					params = switch_core_sprintf(gateway->pool, ";transport=%s;gw=%s", register_transport, gateway->name);
+					params = switch_core_sprintf(gateway->pool, ";transport=%s;gw=%s", /*register_transport*/"udp", gateway->name);
 				}
 			}
 
