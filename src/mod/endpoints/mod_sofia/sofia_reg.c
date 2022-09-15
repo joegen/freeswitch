@@ -133,6 +133,7 @@ static void sofia_reg_kill_reg(sofia_gateway_t *gateway_ptr)
 		return;
 	}
 
+#if 0
 	if (gateway_ptr->state == REG_STATE_REGED || gateway_ptr->state == REG_STATE_UNREGISTER) {
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "UN-Registering %s\n", gateway_ptr->name);
 		nua_unregister(gateway_ptr->nh,
@@ -141,6 +142,9 @@ static void sofia_reg_kill_reg(sofia_gateway_t *gateway_ptr)
 	} else {
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Destroying registration handle for %s\n", gateway_ptr->name);
 	}
+#else
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Destroying registration handle for %s\n", gateway_ptr->name);
+#endif
 
 	sofia_private_free(gateway_ptr->sofia_private);
 	nua_handle_bind(gateway_ptr->nh, NULL);
