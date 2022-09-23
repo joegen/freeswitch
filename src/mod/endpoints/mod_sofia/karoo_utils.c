@@ -653,6 +653,7 @@ void karoo_parse_single_gateway(sofia_profile_t *profile, switch_xml_t gateway_t
 		}
 
 		sofia_reg_add_gateway(profile, gateway->name, gateway);
+		sofia_reg_check_gateway(profile, switch_epoch_time_now(NULL));
 	}
 }
 
