@@ -677,6 +677,7 @@ static switch_xml_t karoo_create_xml_from_args(int argc, char** argv)
 
 switch_bool_t karoo_profile_cmd(sofia_profile_t* profile, int argc, char** argv, switch_stream_handle_t *stream)
 {
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Checking if argv[1] %s is a karoo command", argv[1]);
   if (argc == 3 && !strcasecmp(argv[1], "killgw_glob")) {
 		karoo_del_gateway_glob(profile, argv[2]);
 		stream->write_function(stream, "+OK glob %s marked for deletion.\n", argv[2]);
@@ -717,7 +718,7 @@ switch_bool_t karoo_profile_cmd(sofia_profile_t* profile, int argc, char** argv,
 		karoo_set_gateway_realm_and_from_domain_glob(profile, argv[2], argv[3]);
 		stream->write_function(stream, "+OK realm/domain set for gateway %s.\n", argv[3]);
     return SWITCH_TRUE;
-  } else if (argc == 4 && !strcasecmp(argv[1], "addgw")) {
+  } else if (argc >= 4 && !strcasecmp(argv[1], "addgw")) {
 		switch_xml_t xml = karoo_create_xml_from_args(argc, argv);
 		if (xml) {
 			karoo_parse_single_gateway(profile, xml);
@@ -727,5 +728,6 @@ switch_bool_t karoo_profile_cmd(sofia_profile_t* profile, int argc, char** argv,
 		}
 		return SWITCH_TRUE;
 	}
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "argv[1] %s is a not karoo command", argv[1]);
   return SWITCH_FALSE;
 }
