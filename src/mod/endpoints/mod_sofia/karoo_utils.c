@@ -248,6 +248,7 @@ void karoo_parse_single_gateway(sofia_profile_t *profile, switch_xml_t gateway_t
 		gateway->ob_failed_calls = 0;
 		gateway->destination_prefix = "";
 		gateway->registration_spread = 5;
+		gateway->deleted = 0;
 
 		if ((x_params = switch_xml_child(gateway_tag, "variables"))) {
 			param = switch_xml_child(x_params, "variable");
@@ -446,6 +447,11 @@ void karoo_parse_single_gateway(sofia_profile_t *profile, switch_xml_t gateway_t
 			gateway->state = REG_STATE_NOREG;
 			gateway->status = SOFIA_GATEWAY_UP;
 			gateway->uptime = switch_time_now();
+		}
+		else
+		{
+		  gateway->state = REG_STATE_UNREGED;;
+			gateway->status = SOFIA_GATEWAY_DOWN;
 		}
 
 		if (zstr(auth_username)) {
@@ -669,7 +675,7 @@ static switch_xml_t karoo_create_xml_from_args(int argc, char** argv)
 			stream.write_function(&stream, "%s ", argv[i]);
 		}
 	}
-	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Parsing gateway XML  %s", (const char*)stream.data);
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Parsing gateway XML  %s\n", (const char*)stream.data);
 	xml = switch_xml_parse_str_dup(stream.data);
 	switch_safe_free(stream.data);
 	return xml;
@@ -677,7 +683,7 @@ static switch_xml_t karoo_create_xml_from_args(int argc, char** argv)
 
 switch_bool_t karoo_profile_cmd(sofia_profile_t* profile, int argc, char** argv, switch_stream_handle_t *stream)
 {
-	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Checking if argv[1] %s is a karoo command", argv[1]);
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Checking if argv[1] %s is a karoo command\n", argv[1]);
   if (argc == 3 && !strcasecmp(argv[1], "killgw_glob")) {
 		karoo_del_gateway_glob(profile, argv[2]);
 		stream->write_function(stream, "+OK glob %s marked for deletion.\n", argv[2]);
@@ -728,6 +734,6 @@ switch_bool_t karoo_profile_cmd(sofia_profile_t* profile, int argc, char** argv,
 		}
 		return SWITCH_TRUE;
 	}
-	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "argv[1] %s is a not karoo command", argv[1]);
+	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "argv[1] %s is a not karoo command\n", argv[1]);
   return SWITCH_FALSE;
 }

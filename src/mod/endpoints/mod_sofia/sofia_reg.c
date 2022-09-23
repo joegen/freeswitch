@@ -3789,7 +3789,7 @@ switch_status_t sofia_reg_add_gateway(sofia_profile_t *profile, const char *key,
 
 	if ((gp = switch_core_hash_find(mod_sofia_globals.gateway_hash, key))) {
 		if (gp->deleted) {
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Removing deleted gateway from hash.\n");
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "Removing deleted gateway %s from hash.\n", gp->name);
 			switch_core_hash_delete(mod_sofia_globals.gateway_hash, gp->name);
 			switch_core_hash_delete(mod_sofia_globals.gateway_hash, pkey);
 			switch_core_hash_delete(mod_sofia_globals.gateway_hash, key);
