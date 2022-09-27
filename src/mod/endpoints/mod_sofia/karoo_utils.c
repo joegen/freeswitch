@@ -661,7 +661,7 @@ void karoo_parse_single_gateway(sofia_profile_t *profile, switch_xml_t gateway_t
 		sofia_reg_add_gateway(profile, gateway->name, gateway);
 		sofia_reg_check_gateway(profile, switch_epoch_time_now(NULL));
 
-		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE,"Added new gateway %s\n",  name);
+		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE,"Added new gateway %s [%p]\n",  gateway->name, (void*)gateway);
 	}
 }
 
@@ -675,7 +675,6 @@ static switch_xml_t karoo_create_xml_from_args(int argc, char** argv)
 			stream.write_function(&stream, "%s ", argv[i]);
 		}
 	}
-	switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Parsing gateway XML  %s\n", (const char*)stream.data);
 	xml = switch_xml_parse_str_dup(stream.data);
 	switch_safe_free(stream.data);
 	return xml;
