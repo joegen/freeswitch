@@ -2708,8 +2708,10 @@ void sofia_reg_handle_sip_r_register(int status,
 					expi = (uint32_t) atoi(new_expires);
 
 					if (expi > 0 && expi != gateway->freq) {
-						//gateway->freq = expi;
-						//gateway->expires_str = switch_core_sprintf(gateway->pool, "%d", expi);
+#if 1 // JB: For some raeson, this was commented out but it seems the only palce where the frequency is recomputed.
+						gateway->freq = expi;
+						gateway->expires_str = switch_core_sprintf(gateway->pool, "%d", expi);
+#endif
 
 						if (expi > 60) {
 							gateway->expires = switch_epoch_time_now(NULL) + (expi - 15);
