@@ -2710,7 +2710,7 @@ void sofia_reg_handle_sip_r_register(int status,
 					if (expi > 0 && expi != gateway->freq) {
 #if 1 // JB: For some raeson, this was commented out but it seems the only palce where the frequency is recomputed.
 						gateway->freq = expi;
-						gateway->expires_str = switch_core_sprintf(gateway->pool, "%d", expi);
+						//gateway->expires_str = switch_core_sprintf(gateway->pool, "%d", expi); // Resetting this will cause a virtual leak in the pool. Just maintain the expires when we re-register
 #endif
 
 						if (expi > 60) {
