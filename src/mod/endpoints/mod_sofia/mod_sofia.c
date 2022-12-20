@@ -617,6 +617,7 @@ switch_status_t sofia_on_hangup(switch_core_session_t *session)
 				}
 				if (!sofia_test_flag(tech_pvt, TFLAG_BYE)) {
 					char *cid = generate_pai_str(tech_pvt);
+					char* fs_session_uuid = switch_core_session_sprintf(tech_pvt->session, "X-FS-UUID: %s", switch_core_session_get_uuid(tech_pvt->session));
 
 					if (sip_cause > 299) {
 						switch_channel_clear_app_flag_key("T38", tech_pvt->channel, CF_APP_T38);
@@ -633,6 +634,7 @@ switch_status_t sofia_on_hangup(switch_core_session_t *session)
 								TAG_IF(tech_pvt->respond_dest, SIPTAG_CONTACT_STR(tech_pvt->respond_dest)),
 								TAG_IF(!zstr(max_forwards), SIPTAG_MAX_FORWARDS_STR(max_forwards)),
 								TAG_IF(!zstr(session_id_header), SIPTAG_HEADER_STR(session_id_header)),
+								TAG_IF(!zstr(fs_session_uuid), SIPTAG_HEADER_STR(fs_session_uuid)),
 								TAG_END());
 
 					switch_safe_free(resp_headers);
@@ -936,6 +938,7 @@ static switch_status_t sofia_answer_channel(switch_core_session_t *session)
 	if (!sofia_test_flag(tech_pvt, TFLAG_BYE)) {
 		char *extra_headers = sofia_glue_get_extra_headers(channel, SOFIA_SIP_RESPONSE_HEADER_PREFIX);
 		char *cid = NULL;
+		char* fs_session_uuid = switch_core_session_sprintf(tech_pvt->session, "X-FS-UUID: %s", switch_core_session_get_uuid(tech_pvt->session));
 
 
 		cid = generate_pai_str(tech_pvt);
@@ -990,7 +993,9 @@ static switch_status_t sofia_answer_channel(switch_core_session_t *session)
 						SOATAG_RTP_SELECT(1),
 						TAG_IF(!zstr(extra_headers), SIPTAG_HEADER_STR(extra_headers)),
 						TAG_IF(switch_stristr("update_display", tech_pvt->x_freeswitch_support_remote),
-							   SIPTAG_HEADER_STR("X-FS-Support: " FREESWITCH_SUPPORT)), TAG_END());
+							   SIPTAG_HEADER_STR("X-FS-Support: " FREESWITCH_SUPPORT)),
+						TAG_IF(fs_session_uuid, SIPTAG_HEADER_STR(fs_session_uuid)),
+						TAG_END());
 		} else {
 			nua_respond(tech_pvt->nh, SIP_200_OK,
 						NUTAG_AUTOANSWER(0),
@@ -1008,7 +1013,9 @@ static switch_status_t sofia_answer_channel(switch_core_session_t *session)
 						SIPTAG_PAYLOAD_STR(tech_pvt->mparams.local_sdp_str),
 						TAG_IF(!zstr(extra_headers), SIPTAG_HEADER_STR(extra_headers)),
 						TAG_IF(switch_stristr("update_display", tech_pvt->x_freeswitch_support_remote),
-							   SIPTAG_HEADER_STR("X-FS-Support: " FREESWITCH_SUPPORT)), TAG_END());
+							   SIPTAG_HEADER_STR("X-FS-Support: " FREESWITCH_SUPPORT)),
+						TAG_IF(fs_session_uuid, SIPTAG_HEADER_STR(fs_session_uuid)),
+						TAG_END());
 		}
 		switch_safe_free(extra_headers);
 		sofia_set_flag_locked(tech_pvt, TFLAG_ANS);
@@ -2451,6 +2458,7 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 			const char *call_info = switch_channel_get_variable(channel, "presence_call_info_full");
 			char *cid = generate_pai_str(tech_pvt);
 			const char *session_id_header = sofia_glue_session_id_header(tech_pvt->session, tech_pvt->profile);
+			char* fs_session_uuid = switch_core_session_sprintf(tech_pvt->session, "X-FS-UUID: %s", switch_core_session_get_uuid(tech_pvt->session));
 
 			nua_respond(tech_pvt->nh, SIP_180_RINGING,
 						SIPTAG_CONTACT_STR(tech_pvt->reply_contact),
@@ -2460,6 +2468,7 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 						TAG_IF(switch_stristr("update_display", tech_pvt->x_freeswitch_support_remote),
 							   SIPTAG_HEADER_STR("X-FS-Support: " FREESWITCH_SUPPORT)),
 						TAG_IF(!zstr(session_id_header), SIPTAG_HEADER_STR(session_id_header)),
+						TAG_IF(!zstr(fs_session_uuid), SIPTAG_HEADER_STR(fs_session_uuid)),
 						TAG_END());
 		}
 		break;
@@ -2479,6 +2488,7 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 				char *extra_header = sofia_glue_get_extra_headers(channel, SOFIA_SIP_PROGRESS_HEADER_PREFIX);
 				const char *call_info = switch_channel_get_variable(channel, "presence_call_info_full");
 				char *cid = generate_pai_str(tech_pvt);
+				char* fs_session_uuid = switch_core_session_sprintf(tech_pvt->session, "X-FS-UUID: %s", switch_core_session_get_uuid(tech_pvt->session));
 				const char *session_id_header = sofia_glue_session_id_header(tech_pvt->session, tech_pvt->profile);
 
 				/* Set sip_to_tag to local tag for inbound channels. */
@@ -2502,6 +2512,7 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 								TAG_IF(switch_stristr("update_display", tech_pvt->x_freeswitch_support_remote),
 									   SIPTAG_HEADER_STR("X-FS-Support: " FREESWITCH_SUPPORT)),
 								TAG_IF(!zstr(session_id_header), SIPTAG_HEADER_STR(session_id_header)),
+								TAG_IF(!zstr(fs_session_uuid), SIPTAG_HEADER_STR(fs_session_uuid)),
 								TAG_END());
 					break;
 
@@ -2635,6 +2646,7 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 					char *extra_header = sofia_glue_get_extra_headers(channel, SOFIA_SIP_PROGRESS_HEADER_PREFIX);
 					char *cid = NULL;
 					const char *session_id_header = sofia_glue_session_id_header(session, tech_pvt->profile);
+					char* fs_session_uuid = switch_core_session_sprintf(tech_pvt->session, "X-FS-UUID: %s", switch_core_session_get_uuid(tech_pvt->session));
 
 					cid = generate_pai_str(tech_pvt);
 
@@ -2665,6 +2677,7 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 									TAG_IF(switch_stristr("update_display", tech_pvt->x_freeswitch_support_remote),
 										   SIPTAG_HEADER_STR("X-FS-Support: " FREESWITCH_SUPPORT)),
 									TAG_IF(!zstr(session_id_header), SIPTAG_HEADER_STR(session_id_header)),
+									TAG_IF(!zstr(fs_session_uuid), SIPTAG_HEADER_STR(fs_session_uuid)),
 									TAG_END());
 					} else {
 						nua_respond(tech_pvt->nh,
@@ -2681,6 +2694,7 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 									TAG_IF(switch_stristr("update_display", tech_pvt->x_freeswitch_support_remote),
 										   SIPTAG_HEADER_STR("X-FS-Support: " FREESWITCH_SUPPORT)),
 									TAG_IF(!zstr(session_id_header), SIPTAG_HEADER_STR(session_id_header)),
+									TAG_IF(!zstr(fs_session_uuid), SIPTAG_HEADER_STR(fs_session_uuid)),
 									TAG_END());
 					}
 					switch_safe_free(extra_header);

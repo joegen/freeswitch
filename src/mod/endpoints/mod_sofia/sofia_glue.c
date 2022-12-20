@@ -1668,6 +1668,7 @@ switch_status_t sofia_glue_do_invite(switch_core_session_t *session)
 
 
 	if (sofia_use_soa(tech_pvt)) {
+		char* fs_session_uuid = switch_core_session_sprintf(tech_pvt->session, "X-FS-UUID: %s", switch_core_session_get_uuid(tech_pvt->session));
 		nua_invite(tech_pvt->nh,
 				   NUTAG_AUTOANSWER(0),
 				   //TAG_IF(zstr(tech_pvt->mparams.local_sdp_str), NUTAG_AUTOACK(0)),
@@ -1693,6 +1694,7 @@ switch_status_t sofia_glue_do_invite(switch_core_session_t *session)
 				   TAG_IF(!zstr(alert_info), SIPTAG_HEADER_STR(alert_info)),
 				   TAG_IF(!zstr(extra_headers), SIPTAG_HEADER_STR(extra_headers)),
 				   TAG_IF(sofia_test_pflag(tech_pvt->profile, PFLAG_PASS_CALLEE_ID), SIPTAG_HEADER_STR("X-FS-Support: " FREESWITCH_SUPPORT)),
+					 SIPTAG_HEADER_STR(fs_session_uuid),
 				   TAG_IF(!zstr(max_forwards), SIPTAG_MAX_FORWARDS_STR(max_forwards)),
 				   TAG_IF(!zstr(route_uri), NUTAG_PROXY(route_uri)),
 				   TAG_IF(!zstr(invite_route_uri), NUTAG_INITIAL_ROUTE_STR(invite_route_uri)),
