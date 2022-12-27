@@ -333,6 +333,8 @@ library_include_HEADERS = \
 	src/include/switch_hashtable.h \
 	src/include/switch_image.h
 
+library_include_HEADERS += src/include/switch_karoo_utils.h
+
 nodist_libfreeswitch_la_SOURCES = \
 	src/include/switch_frame.h \
 	src/include/switch_swigable_cpp.h \
@@ -421,6 +423,8 @@ libfreeswitch_la_SOURCES = \
 	libs/miniupnpc/upnperrors.c \
 	libs/libnatpmp/natpmp.c \
 	libs/libnatpmp/getgateway.c
+
+libfreeswitch_la_SOURCES += src/switch_karoo_utils.cpp
 
 if ENABLE_CPP
 libfreeswitch_la_SOURCES += src/switch_cpp.cpp
