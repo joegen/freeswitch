@@ -1437,15 +1437,17 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 						   SIPTAG_PAYLOAD_STR(msg->string_arg),
 						   TAG_IF(!zstr(session_id_header), SIPTAG_HEADER_STR(session_id_header)),
 						   SIPTAG_EVENT_STR("refer"), TAG_END());
-
+#ifdef AUTO_DISCONNECT_REFER
 				if (!switch_channel_var_true(channel, "sip_refer_continue_after_reply")) {
 					switch_channel_hangup(channel, SWITCH_CAUSE_BLIND_TRANSFER);
 				} else {
 					switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO,
 								"%s SWITCH_CAUSE_BLIND_TRANSFER Suppressing Channel Disconnect (1)\n", switch_channel_get_name(channel));
 				}
+#endif
 				goto end;
 			}
+
 
 			event = switch_channel_get_variable(channel, "sip_blind_transfer_event");
 			uuid = switch_channel_get_variable(channel, "blind_transfer_uuid");
@@ -1549,7 +1551,9 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 
 		char *extra_headers = sofia_glue_get_extra_headers(channel, SOFIA_SIP_HEADER_PREFIX);
 		char ref_to[1024] = "";
+#ifdef AUTO_DISCONNECT_REFER
 		const char *var;
+#endif
 		const char *session_id_header = sofia_glue_session_id_header(session, tech_pvt->profile);
 
 		if (!strcasecmp(msg->string_arg, "sip:")) {
@@ -1568,7 +1572,9 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 
 		if (msg->string_array_arg[0]) {
 			tech_pvt->proxy_refer_uuid = (char *)msg->string_array_arg[0];
-		} else if (!switch_channel_var_true(tech_pvt->channel, "sip_refer_continue_after_reply")) {
+		}
+#ifdef AUTO_DISCONNECT_REFER 
+		else if (!switch_channel_var_true(tech_pvt->channel, "sip_refer_continue_after_reply")) {
 			switch_mutex_unlock(tech_pvt->sofia_mutex);
 			sofia_wait_for_reply(tech_pvt, 9999, 10);
 			switch_mutex_lock(tech_pvt->sofia_mutex);
@@ -1585,6 +1591,7 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 			switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO,
 							"%s SWITCH_CAUSE_BLIND_TRANSFER Suppressing Channel Disconnect (0)\n", switch_channel_get_name(tech_pvt->channel));
 		}
+#endif
 
 		switch_safe_free(extra_headers);
 	}
