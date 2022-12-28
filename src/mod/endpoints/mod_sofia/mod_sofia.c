@@ -1433,7 +1433,9 @@ static switch_status_t sofia_receive_message(switch_core_session_t *session, swi
 				const char *session_id_header = sofia_glue_session_id_header(session, tech_pvt->profile);
 				nua_notify(tech_pvt->nh, NUTAG_NEWSUB(1), SIPTAG_CONTENT_TYPE_STR("message/sipfrag;version=2.0"),
 						   NUTAG_SUBSTATE(nua_substate_terminated),
+#if 0
 						   SIPTAG_SUBSCRIPTION_STATE_STR("terminated;reason=noresource"),
+#endif
 						   SIPTAG_PAYLOAD_STR(msg->string_arg),
 						   TAG_IF(!zstr(session_id_header), SIPTAG_HEADER_STR(session_id_header)),
 						   SIPTAG_EVENT_STR("refer"), TAG_END());
