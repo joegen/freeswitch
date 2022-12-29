@@ -3,12 +3,15 @@
 
 #include <switch.h>
 
+
 typedef char* (*switch_get_outbound_proxy_fun)(const char* realm, const char* routeSet);
 typedef char* (*switch_get_user_agent_fun)(const char* realm);
+typedef char* (*switch_dialplan_fetch_fun)(const char *section, const char *tag_name, const char *key_name, const char *key_value, const char *paramsJson);
 struct switch_global_functions
 {
 	switch_get_outbound_proxy_fun switch_get_outbound_proxy;
 	switch_get_user_agent_fun switch_get_user_agent;
+	switch_dialplan_fetch_fun switch_dialplan_fetch;
 };
 
 typedef struct switch_global_functions switch_global_functions;
