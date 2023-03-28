@@ -4,7 +4,7 @@
 #include <switch.h>
 
 
-typedef char* (*switch_get_outbound_proxy_fun)(const char* realm, const char* routeSet);
+typedef char* (*switch_get_outbound_proxy_fun)(const char* user, const char* realm, const char* routeSet);
 typedef char* (*switch_get_user_agent_fun)(const char* realm);
 typedef char* (*switch_dialplan_fetch_fun)(const char *section, const char *tag_name, const char *key_name, const char *key_value, const char *paramsJson);
 struct switch_global_functions

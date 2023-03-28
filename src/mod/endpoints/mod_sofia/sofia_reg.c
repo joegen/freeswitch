@@ -485,7 +485,7 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 					char* user_agent_override = 0;
 
 					if (SWITCH_GLOBAL_funcs.switch_get_outbound_proxy) {
-						proxy_override = SWITCH_GLOBAL_funcs.switch_get_outbound_proxy(gateway_ptr->from_domain, gateway_ptr->register_route);
+						proxy_override = SWITCH_GLOBAL_funcs.switch_get_outbound_proxy(gateway_ptr->from_user, gateway_ptr->from_domain, gateway_ptr->register_route);
 						if (proxy_override && strcmp(gateway_ptr->register_proxy, proxy_override)) {
 							gateway_ptr->register_sticky_proxy = switch_core_strdup(gateway_ptr->pool, proxy_override);
 							gateway_ptr->register_proxy = switch_core_strdup(gateway_ptr->pool, proxy_override);
