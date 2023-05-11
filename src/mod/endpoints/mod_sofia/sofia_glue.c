@@ -1155,8 +1155,16 @@ switch_status_t sofia_glue_do_invite(switch_core_session_t *session)
 	}
 
 	if (!switch_channel_get_private(tech_pvt->channel, "t38_options") || zstr(tech_pvt->mparams.local_sdp_str)) {
+		switch_channel_callstate_t callstate = switch_channel_get_callstate(channel);
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "Generating SDP for %s\n", switch_channel_get_name(tech_pvt->channel));
-		switch_core_media_gen_local_sdp(session, SDP_TYPE_REQUEST, NULL, 0, NULL, 0);
+		if (callstate == CCS_ACTIVE || callstate == CCS_UNHELD)
+		{
+			switch_core_media_gen_local_sdp(session, SDP_TYPE_REQUEST, NULL, 0, "sendrecv", 0);
+		}
+		else
+		{
+			switch_core_media_gen_local_sdp(session, SDP_TYPE_REQUEST, NULL, 0, NULL, 0);
+		}
 	}
 	else
 	{
