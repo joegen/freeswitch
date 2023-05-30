@@ -1156,11 +1156,11 @@ switch_status_t sofia_glue_do_invite(switch_core_session_t *session)
 
 	if (!switch_channel_get_private(tech_pvt->channel, "t38_options") || zstr(tech_pvt->mparams.local_sdp_str)) {
 		switch_channel_callstate_t callstate = switch_channel_get_callstate(channel);
-		if ((switch_channel_test_flag(channel, CF_PROXY_MEDIA) || switch_channel_test_flag(channel, CF_PROXY_MODE)) && (callstate == CCS_ACTIVE || callstate == CCS_UNHELD)) {
+		if (switch_true(switch_channel_get_variable_dup(tech_pvt->channel, "session_locally_held", SWITCH_FALSE, -1))  && (callstate == CCS_ACTIVE || callstate == CCS_UNHELD)) {
 			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "WITHMEDIA Generating SDP for %s (sendrecv forced)\n", switch_channel_get_name(tech_pvt->channel));
 			switch_core_media_gen_local_sdp(session, SDP_TYPE_REQUEST, NULL, 0, "sendrecv", 0);
 		} else {
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "NOMEDIA Generating SDP for %s\n", switch_channel_get_name(tech_pvt->channel));
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG, "Generating SDP for %s\n", switch_channel_get_name(tech_pvt->channel));
 			switch_core_media_gen_local_sdp(session, SDP_TYPE_REQUEST, NULL, 0, NULL, 0);
 	  }
 	}
