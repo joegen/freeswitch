@@ -421,6 +421,7 @@ switch_status_t sofia_on_hangup(switch_core_session_t *session)
 	const char *ps_cause = NULL, *use_my_cause;
 	const char *gateway_name = NULL;
 	sofia_gateway_t *gateway_ptr = NULL;
+	const char *reason_phrase_override = NULL;
 
 	if ((gateway_name = switch_channel_get_variable(channel, "sip_gateway_name"))) {
 		gateway_ptr = sofia_reg_find_gateway(gateway_name);
@@ -623,6 +624,14 @@ switch_status_t sofia_on_hangup(switch_core_session_t *session)
 						switch_channel_clear_app_flag_key("T38", tech_pvt->channel, CF_APP_T38);
 						switch_channel_clear_app_flag_key("T38", tech_pvt->channel, CF_APP_T38_REQ);
 						switch_channel_set_app_flag_key("T38", tech_pvt->channel, CF_APP_T38_FAIL);
+					}
+
+					if (sip_cause > 299) {
+						reason_phrase_override = switch_channel_get_variable(channel, "reason_phrase_override");
+						if (!zstr(reason_phrase_override)) {
+							phrase = reason_phrase_override;
+							switch_channel_set_variable(channel, "reason_phrase_override", "");
+						}
 					}
 
 					nua_respond(tech_pvt->nh, sip_cause, phrase,
