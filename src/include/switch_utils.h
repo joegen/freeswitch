@@ -727,6 +727,7 @@ switch_mutex_unlock((obj)->flag_mutex);
 
 static inline char *switch_sanitize_number(char *number)
 {
+#if 0
 	char *p = number, *q;
 	char warp[] = "/:";
 	int i;
@@ -746,6 +747,9 @@ static inline char *switch_sanitize_number(char *number)
 	}
 
 	return p;
+#else
+	return number;
+#endif
 }
 
 static inline switch_bool_t switch_string_var_check(char *s, switch_bool_t disable)
