@@ -253,7 +253,7 @@ char *generate_pai_str(private_object_t *tech_pvt)
 	}
 
 	callee_number = switch_sanitize_number(switch_core_session_strdup(session, callee_number));
-	callee_name = switch_sanitize_number(switch_core_session_strdup(session, callee_name));
+	callee_name = switch_core_session_strdup(session, callee_name);
 
 	if (!zstr(callee_number) && (zstr(ua) || !switch_stristr("polycom", ua))) {
 		callee_number = switch_core_session_sprintf(session, "sip:%s@%s", callee_number, host);
@@ -5169,8 +5169,8 @@ static switch_call_cause_t sofia_outgoing_channel(switch_core_session_t *session
 
 
 	caller_profile->destination_number = switch_sanitize_number(caller_profile->destination_number);
-	not_const = (char *) caller_profile->caller_id_name;
-	caller_profile->caller_id_name = switch_sanitize_number(not_const);
+	//not_const = (char *) caller_profile->caller_id_name;
+	//caller_profile->caller_id_name = switch_sanitize_number(not_const);
 	not_const = (char *) caller_profile->caller_id_number;
 	caller_profile->caller_id_number = switch_sanitize_number(not_const);
 
