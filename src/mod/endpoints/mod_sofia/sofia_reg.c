@@ -483,7 +483,18 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 				if (now) {
 					char* proxy_override = 0;
 					char* user_agent_override = 0;
+					switch_bool_t user_found = SWITCH_TRUE;
 
+					if (SWITCH_GLOBAL_funcs.switch_is_user_existing) {
+						user_found = SWITCH_GLOBAL_funcs.switch_is_user_existing(gateway_ptr->from_user, gateway_ptr->from_domain);
+					}
+
+					if (!user_found) {
+						switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_WARNING, "User %s@%s not found, not registering\n", gateway_ptr->from_user, gateway_ptr->from_domain);
+						gateway_ptr->state = REG_STATE_UNREGED;
+						gateway_ptr->retry = now + gateway_ptr->retry_seconds;
+						break;
+					}
 					if (SWITCH_GLOBAL_funcs.switch_get_outbound_proxy) {
 						proxy_override = SWITCH_GLOBAL_funcs.switch_get_outbound_proxy(gateway_ptr->from_user, gateway_ptr->from_domain, gateway_ptr->register_route);
 						if (proxy_override && strcmp(gateway_ptr->register_proxy, proxy_override)) {
