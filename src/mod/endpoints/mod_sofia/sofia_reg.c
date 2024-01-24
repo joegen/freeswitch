@@ -482,7 +482,6 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 
 				if (now) {
 					char* proxy_override = 0;
-					char* user_agent_override = 0;
 					switch_bool_t user_found = SWITCH_TRUE;
 
 					if (SWITCH_GLOBAL_funcs.switch_is_user_existing) {
@@ -502,14 +501,6 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 							gateway_ptr->register_proxy = switch_core_strdup(gateway_ptr->pool, proxy_override);
 						}
 						switch_safe_free(proxy_override);
-					}
-
-					if (SWITCH_GLOBAL_funcs.switch_get_user_agent) {
-						user_agent_override = SWITCH_GLOBAL_funcs.switch_get_user_agent(gateway_ptr->from_domain);
-						if (user_agent_override && zstr(gateway_ptr->register_user_agent)) {
-							gateway_ptr->register_user_agent = switch_core_strdup(gateway_ptr->pool, user_agent_override);
-						}
-						switch_safe_free(user_agent_override);
 					}
 
 					nua_register(gateway_ptr->nh,
