@@ -2468,8 +2468,7 @@ void sofia_event_callback(nua_event_t event,
 			if (sess_count >= sess_max || !sofia_test_pflag(profile, PFLAG_RUNNING) || !switch_core_ready_inbound()) {
 				nua_respond(nh, 503, "Maximum Calls In Progress", SIPTAG_RETRY_AFTER_STR("300"), NUTAG_WITH_THIS(nua), TAG_END());
 				nua_handle_destroy(nh);
-				//goto end;
-				abort();
+				goto end;
 			}
 
 
@@ -2604,8 +2603,7 @@ void sofia_event_callback(nua_event_t event,
 			nua_handle_unref_user(nh);
 			nua_unref_user(nua);
 
-			//goto end;
-			abort();
+			goto end;
 		}
 
 
@@ -2617,7 +2615,6 @@ void sofia_event_callback(nua_event_t event,
 				sofia_private_free(sofia_private);
 				switch_core_session_destroy(&session);
 				nua_respond(nh, 503, "Maximum Calls In Progress", SIPTAG_RETRY_AFTER_STR("300"), TAG_END());
-				abort();
 			}
 			switch_mutex_lock(profile->flag_mutex);
 			if ((uuid = switch_core_hash_find(profile->chat_hash, tech_pvt->call_id))) {
@@ -10482,8 +10479,7 @@ void sofia_handle_sip_i_invite(switch_core_session_t *session, nua_t *nua, sofia
 	if (!session || (sess_count >= sess_max || !sofia_test_pflag(profile, PFLAG_RUNNING))) {
 		nua_respond(nh, 503, "Maximum Calls In Progress", SIPTAG_RETRY_AFTER_STR("300"),
 					TAG_IF(!zstr(session_id_header), SIPTAG_HEADER_STR(session_id_header)), TAG_END());
-		//goto fail;
-		abort();
+		goto fail;
 	}
 
 	tech_pvt = switch_core_session_get_private(session);
@@ -11929,7 +11925,6 @@ void sofia_handle_sip_i_options(int status,
 	if (sofia_test_pflag(profile, PFLAG_OPTIONS_RESPOND_503_ON_BUSY) &&
 			(sess_count >= sess_max || !sofia_test_pflag(profile, PFLAG_RUNNING) || !switch_core_ready_inbound())) {
 		nua_respond(nh, 503, "Maximum Calls In Progress", NUTAG_WITH_THIS_MSG(de->data->e_msg), SIPTAG_RETRY_AFTER_STR("300"), TAG_END());
-		abort();
 	} else {
 		switch_assert(sip);
 		nua_respond(nh, SIP_200_OK, NUTAG_WITH_THIS_MSG(de->data->e_msg),
