@@ -336,6 +336,13 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 	switch_event_t *event;
 	int delta = 0;
 
+	if (SWITCH_GLOBAL_funcs.sofia_reg_check_gateway) {
+		if (SWITCH_GLOBAL_funcs.sofia_reg_check_gateway(profile, now)) {
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_INFO, "SWITCH_GLOBAL_funcs.sofia_reg_check_gateway returned true, skipping gateway check\n");
+			return;
+		}
+	}
+
 	switch_mutex_lock(profile->gw_mutex);
 	for (gateway_ptr = profile->gateways; gateway_ptr; gateway_ptr = gateway_ptr->next) {
 		if (gateway_ptr->deleted) {
