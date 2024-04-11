@@ -3612,9 +3612,7 @@ static switch_status_t cmd_profile(char **argv, int argc, switch_stream_handle_t
 			stream->write_function(stream, "+OK every gateway marked for deletion.\n");
 		} else {
 			if ((gateway_ptr = sofia_reg_find_gateway(argv[2]))) {
-				switch_mutex_lock(profile->gw_mutex);
 				sofia_glue_del_gateway(gateway_ptr);
-				switch_mutex_unlock(profile->gw_mutex);
 				sofia_reg_release_gateway(gateway_ptr);
 				stream->write_function(stream, "+OK gateway marked for deletion.\n");
 			} else {
