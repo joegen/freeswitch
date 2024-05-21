@@ -2741,8 +2741,8 @@ void sofia_reg_handle_sip_r_register(int status,
 		default:
 			gateway->state = REG_STATE_FAILED;
 			gateway->failure_status = status;
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "%s Failed Registration with status %s [%d]. failure #%d\n",
-							  gateway->name, switch_str_nil(phrase), status, ++gateway->failures);
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "%s Failed Registration with status %s [%d]. failure #%d. Route: %s\n",
+							  gateway->name, switch_str_nil(phrase), status, ++gateway->failures, switch_str_nil(gateway->register_route));
 			break;
 		}
 		if (ostate != gateway->state ||
