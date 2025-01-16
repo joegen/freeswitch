@@ -584,6 +584,7 @@ void sofia_handle_sip_i_notify(switch_core_session_t *session, int status,
 	int sub_state;
 	sofia_gateway_t *gateway = NULL;
 	const char *session_id_header = sofia_glue_session_id_header(session, profile);
+	const char* autodisconnect_refer = switch_channel_get_variable(switch_core_session_get_channel(session), "autodisconnect_refer");
 
 	tl_gets(tags, NUTAG_SUBSTATE_REF(sub_state), TAG_END());
 
@@ -681,14 +682,18 @@ void sofia_handle_sip_i_notify(switch_core_session_t *session, int status,
 				if (!status_val || status_val >= 200) {
 					switch_channel_set_variable_printf(channel, "sip_refer_target_status_code", "%d", status_val);
 					switch_channel_set_variable(channel, "sip_refer_reply", sip->sip_payload->pl_data);
-#ifdef AUTO_DISCONNECT_REFER
-					if (status_val == 200 && !switch_channel_var_true(channel, "sip_refer_continue_after_reply")) {
-						switch_channel_hangup(channel, SWITCH_CAUSE_BLIND_TRANSFER);
-					} else {
-						switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO,
-							"%s SWITCH_CAUSE_BLIND_TRANSFER Suppressing Channel Disconnect (2)\n", switch_channel_get_name(channel));
+
+					//
+					// Check if the autodisconnect_refer variable is set to true, if so, then we will disconnect the channel
+					//
+					if (!zstr(autodisconnect_refer) && switch_true(autodisconnect_refer)) {
+						if (status_val == 200) {
+							switch_channel_hangup(channel, SWITCH_CAUSE_BLIND_TRANSFER);
+						} else {
+							switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO,
+								"%s SWITCH_CAUSE_BLIND_TRANSFER Suppressing Channel Disconnect (2)\n", switch_channel_get_name(channel));
+						}
 					}
-#endif
 					if ((int)tech_pvt->want_event == 9999) {
 						tech_pvt->want_event = 0;
 					}
