@@ -2867,16 +2867,16 @@ void sofia_glue_actually_execute_sql(sofia_profile_t *profile, char *sql, switch
 
 	switch_cache_db_execute_sql(dbh, sql, &err);
 
-	if (mutex) {
-		switch_mutex_unlock(mutex);
-	}
-
 	if (err) {
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "SQL ERR: [%s]\n%s\n", err, sql);
 		free(err);
 	}
 
 	switch_cache_db_release_db_handle(&dbh);
+
+	if (mutex) {
+		switch_mutex_unlock(mutex);
+	}
 }
 
 switch_bool_t sofia_glue_execute_sql_callback(sofia_profile_t *profile,
@@ -2902,16 +2902,16 @@ switch_bool_t sofia_glue_execute_sql_callback(sofia_profile_t *profile,
 
 	switch_cache_db_execute_sql_callback(dbh, sql, callback, pdata, &errmsg);
 
-	if (mutex) {
-		switch_mutex_unlock(mutex);
-	}
-
 	if (errmsg) {
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "SQL ERR: [%s] %s\n", sql, errmsg);
 		free(errmsg);
 	}
 
 	switch_cache_db_release_db_handle(&dbh);
+
+	if (mutex) {
+		switch_mutex_unlock(mutex);
+	}
 
 	return ret;
 }
@@ -2938,16 +2938,16 @@ char *sofia_glue_execute_sql2str(sofia_profile_t *profile, switch_mutex_t *mutex
 
 	ret = switch_cache_db_execute_sql2str(dbh, sql, resbuf, len, &err);
 
-	if (mutex) {
-		switch_mutex_unlock(mutex);
-	}
-
 	if (err) {
 		switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "SQL ERR: [%s]\n%s\n", err, sql);
 		free(err);
 	}
 
 	switch_cache_db_release_db_handle(&dbh);
+
+	if (mutex) {
+		switch_mutex_unlock(mutex);
+	}
 
 	return ret;
 }
