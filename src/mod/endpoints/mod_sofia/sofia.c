@@ -584,7 +584,6 @@ void sofia_handle_sip_i_notify(switch_core_session_t *session, int status,
 	int sub_state;
 	sofia_gateway_t *gateway = NULL;
 	const char *session_id_header = sofia_glue_session_id_header(session, profile);
-	const char* autodisconnect_refer = switch_channel_get_variable(switch_core_session_get_channel(session), "autodisconnect_refer");
 
 	tl_gets(tags, NUTAG_SUBSTATE_REF(sub_state), TAG_END());
 
@@ -672,6 +671,7 @@ void sofia_handle_sip_i_notify(switch_core_session_t *session, int status,
 
 	if (!strcasecmp(sip->sip_event->o_type, "refer")) {
 		if (session && channel && tech_pvt) {
+			const char *autodisconnect_refer = switch_channel_get_variable(channel, "autodisconnect_refer");
 			if (sip->sip_payload && sip->sip_payload->pl_data) {
 				char *p;
 				int status_val = 0;

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  Regression scenario for the mod_sofia NULL-session NOTIFY crash
+  (tracker 2026-06-22-1_sofia-notify-null-session-crash).
+
+  Sends a single OUT-OF-DIALOG refer-event NOTIFY to the sofia profile.
+  mod_sofia has no switch_core_session for it, so sofia_handle_sip_i_notify()
+  is entered with session == NULL -- the exact condition that crashed at the
+  (now removed) hoisted fetch. A fixed mod_sofia answers 200 OK
+  (RFC 5057: the refer-subscription usage is acknowledged); an unfixed
+  mod_sofia SIGSEGVs (and, because FST hosts the core in-process, takes the
+  test binary down with it).
+-->
+<scenario name="UAC unsolicited refer NOTIFY (NULL-session crash regression)">
+
+  <send retrans="500">
+    <![CDATA[
+
+      NOTIFY sip:[service]@[remote_ip]:[remote_port] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[pid]SIPpTag00[call_number]
+      To: <sip:[service]@[remote_ip]:[remote_port]>
+      Call-ID: [call_id]
+      CSeq: 1 NOTIFY
+      Contact: <sip:sipp@[local_ip]:[local_port]>
+      Max-Forwards: 70
+      Event: refer
+      Subscription-State: active;expires=60
+      Content-Type: message/sipfrag;version=2.0
+      Content-Length: [len]
+
+      SIP/2.0 200 OK
+    ]]>
+  </send>
+
+  <!-- A fixed mod_sofia returns a final 200 OK. Any final response proves the
+       core did not crash; we assert specifically on 200 (RFC 5057-correct). -->
+  <recv response="200" timeout="8000">
+  </recv>
+
+</scenario>
